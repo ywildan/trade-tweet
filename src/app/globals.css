@@ -1,0 +1,119 @@
+@import "tailwindcss";
+
+/* ============================================================
+   SPMTrade — Design Token (DESIGN.md §2)
+   Dark mode = default. Light mode via [data-theme="light"].
+   ============================================================ */
+
+:root {
+  --bg: #000000;
+  --bg-elev: #16181c;
+  --bg-input: #202327;
+  --border: #2f3336;
+  --text: #e7e9ea;
+  --text-muted: #71767b;
+  --accent: #1d9bf0;
+  --accent-hover: #1a8cd8;
+  --like: #f91880;
+  --repost: #00ba7c;
+  --save: #1d9bf0;
+  --long: #00ba7c;
+  --short: #f4212e;
+  --gold: #d4a017;
+  --verified: #1d9bf0;
+}
+
+[data-theme="light"] {
+  --bg: #ffffff;
+  --bg-elev: #f7f9f9;
+  --bg-input: rgba(0, 0, 0, 0.03);
+  --border: #eff3f4;
+  --text: #0f1419;
+  --text-muted: #536471;
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-bg-elev: var(--bg-elev);
+  --color-bg-input: var(--bg-input);
+  --color-border: var(--border);
+  --color-text: var(--text);
+  --color-text-muted: var(--text-muted);
+  --color-accent: var(--accent);
+  --color-accent-hover: var(--accent-hover);
+  --color-like: var(--like);
+  --color-repost: var(--repost);
+  --color-save: var(--save);
+  --color-long: var(--long);
+  --color-short: var(--short);
+  --color-gold: var(--gold);
+  --color-verified: var(--verified);
+
+  --font-sans: -apple-system, "Segoe UI", Roboto, "Helvetica Neue",
+    "InterVariable", Inter, system-ui, sans-serif;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-sans);
+  font-size: 15px;
+  line-height: 20px;
+  -webkit-font-smoothing: antialiased;
+}
+
+::selection {
+  background: color-mix(in srgb, var(--accent) 30%, transparent);
+}
+
+/* Scrollbar tipis ala X.com */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--border) transparent;
+}
+*::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+*::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 3px;
+}
+
+/* Focus ring a11y (DESIGN.md §10) */
+:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent) 40%, transparent);
+}
+
+/* Angka agar rapi saat live-update */
+.tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Like pop (DESIGN.md §2.3 & §9) */
+@keyframes like-pop {
+  0% {
+    transform: scale(1);
+  }
+  40% {
+    transform: scale(1.3);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+.animate-like-pop {
+  animation: like-pop 300ms cubic-bezier(0, 0, 0.2, 1);
+}
+
+/* Ikon ThemeToggle tanpa state React (DESIGN.md §10) */
+.theme-icon-moon {
+  display: none;
+}
+[data-theme="light"] .theme-icon-sun {
+  display: none;
+}
+[data-theme="light"] .theme-icon-moon {
+  display: inline;
+}

@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="400" height="400" role="img" aria-label="Avatar Whale X">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#00ba7c"/>
+      <stop offset="1" stop-color="#054d3b"/>
+    </linearGradient>
+  </defs>
+  <rect width="400" height="400" fill="url(#g)"/>
+  <circle cx="330" cy="70" r="120" fill="#ffffff" opacity="0.08"/>
+  <circle cx="60" cy="360" r="140" fill="#7cf5c7" opacity="0.14"/>
+  <text x="200" y="238" text-anchor="middle" font-family="system-ui, -apple-system, Segoe UI, sans-serif" font-size="132" font-weight="700" fill="#ffffff">WX</text>
+</svg>

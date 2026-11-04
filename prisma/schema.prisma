@@ -1,0 +1,248 @@
+// SPMTrade — Prisma schema (spesifikasi.md §3, TERKUNCI).
+// Migrasi DB dijalankan pada Phase 1 setelah provider Postgres tersedia.
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  // URL koneksi didefinisikan di prisma.config.ts (Prisma 7)
+}
+
+model User {
+  id           String   @id @default(cuid())
+  username     String   @unique // lowercase, regex ^[a-z0-9_]{3,15}$
+  name         String // max 50
+  email        String   @unique
+  passwordHash String?
+  bio          String? // max 160
+  avatarUrl    String?
+  bannerUrl    String?
+  location     String?
+  role         String   @default("USER") // "USER" | "admin"
+  createdAt    DateTime @default(now())
+
+  posts         Post[]
+  following     Follow[]       @relation("follower")
+  followers     Follow[]       @relation("following")
+  likes         Like[]
+  reposts       Repost[]
+  bookmarks     Bookmark[]
+  badges        UserBadge[]
+  signalStats   SignalStat?
+  notifications Notification[] @relation("recipient")
+  notifyGiven   Notification[] @relation("actor")
+}
+
+enum Market {
+  CRYPTO
+  METAL // XAUUSD, XAGUSD, dst.
+  FOREX
+  STOCK
+}
+
+enum Direction {
+  LONG
+  SHORT
+}
+
+enum SignalStatus {
+  OPEN
+  TP_HIT
+  SL_HIT
+  EXPIRED
+  CANCELLED
+}
+
+model Post {
+  id         String    @id @default(cuid())
+  authorId   String
+  author     User      @relation(fields: [authorId], references: [id])
+  content    String    @db.Text // max 280 (emoji = 2 char)
+  quoteOfId  String?
+  replyToId  String?
+  quoteOf    Post?     @relation("PostQuotes", fields: [quoteOfId], references: [id])
+  quotes     Post[]    @relation("PostQuotes")
+  replyTo    Post?     @relation("PostReplies", fields: [replyToId], references: [id])
+  replies    Post[]    @relation("PostReplies")
+  createdAt  DateTime  @default(now())
+  editedAt   DateTime?
+  deletedAt  DateTime? // soft delete
+
+  // --- bagian sinyal (hanya jika isSignal) ---
+  isSignal   Boolean   @default(false)
+  market     Market?
+  symbol     String? // "BTCUSDT" / "XAUUSD" (uppercase)
+  direction  Direction?
+  entry      Float?
+  takeProfit Float?
+  stopLoss   Float?
+  timeframe  String?
+  status     SignalStatus? @default(OPEN)
+  resolvedAt DateTime?
+  resolvedBy String? // "auto" | userId
+  resolveNote String? @db.Text // alasan override manual (Phase 4)
+  pnlPercent Float?
+  disputed   Boolean   @default(false) // hasil override membantah feed
+
+  views      Int       @default(0)
+
+  likes      Like[]
+  reposts    Repost[]
+  bookmarks  Bookmark[]
+  postViews  PostView[]
+  checks     SignalCheck[]
+  notifications Notification[]
+
+  @@index([authorId, createdAt(sort: Desc)])
+  @@index([status, createdAt(sort: Desc)])
+  @@index([symbol, createdAt(sort: Desc)])
+  @@index([replyToId, createdAt(sort: Desc)])
+  @@index([quoteOfId])
+}
+
+model Like     {
+  id        String   @id @default(cuid())
+  userId    String
+  postId    String
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+  post Post @relation(fields: [postId], references: [id])
+
+  @@unique([userId, postId])
+}
+
+model Repost   {
+  id        String   @id @default(cuid())
+  userId    String
+  postId    String
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+  post Post @relation(fields: [postId], references: [id])
+
+  @@unique([userId, postId])
+}
+
+model Bookmark {
+  id        String   @id @default(cuid())
+  userId    String
+  postId    String
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+  post Post @relation(fields: [postId], references: [id])
+
+  @@unique([userId, postId])
+}
+
+model Follow {
+  id          String   @id @default(cuid())
+  followerId  String
+  followingId String
+  createdAt   DateTime @default(now())
+
+  follower  User @relation("follower", fields: [followerId], references: [id])
+  following User @relation("following", fields: [followingId], references: [id])
+
+  @@unique([followerId, followingId])
+}
+
+model UserBadge {
+  id        String   @id @default(cuid())
+  userId    String
+  type      String // §9: verified, curator, sniper, consistent, profit_hunter, analyst
+  awardedAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@unique([userId, type])
+}
+
+model SignalStat {
+  userId       String @id
+  totalSignals Int    @default(0)
+  tpsHit       Int    @default(0)
+  slsHit       Int    @default(0)
+  expired      Int    @default(0)
+  winRate      Float  @default(0)
+  avgPnl       Float  @default(0)
+
+  user User @relation(fields: [userId], references: [id])
+}
+
+model Notification {
+  id          String    @id @default(cuid())
+  recipientId String
+  actorId     String?
+  type        String // like|repost|reply|follow|signal_resolved|badge_awarded|mention
+  postId      String?
+  readAt      DateTime?
+  createdAt   DateTime  @default(now())
+
+  recipient User  @relation("recipient", fields: [recipientId], references: [id])
+  actor     User? @relation("actor", fields: [actorId], references: [id])
+  post      Post? @relation(fields: [postId], references: [id])
+
+  @@index([recipientId, createdAt(sort: Desc)])
+}
+
+// --- Views dedupe (spesifikasi.md §7) ---
+model PostView {
+  id        String @id @default(cuid())
+  postId    String
+  viewerKey String // userId atau hash ip
+  day       String // "2026-11-04"
+  count     Int    @default(0)
+
+  post Post @relation(fields: [postId], references: [id])
+
+  @@unique([postId, viewerKey, day])
+}
+
+model ProfileView {
+  id        String @id @default(cuid())
+  profileId String
+  viewerKey String
+  day       String
+
+  @@unique([profileId, viewerKey, day])
+}
+
+// --- Log harga worker (anti-manipulasi, §8) ---
+model SignalCheck {
+  id     String @id @default(cuid())
+  postId String
+  ts     DateTime
+  price  Float
+
+  post Post @relation(fields: [postId], references: [id])
+}
+
+// --- Cache aggregate harian dashboard (§7) ---
+model DailyStat {
+  id           String @id @default(cuid())
+  userId       String
+  day          String
+  views        Int    @default(0)
+  profileViews Int    @default(0)
+  likes        Int    @default(0)
+  reposts      Int    @default(0)
+  replies      Int    @default(0)
+
+  @@unique([userId, day])
+}
+
+// --- Rate limit sederhana berbasis DB (spesifikasi.md §4 Phase 6) ---
+model RateLimit {
+  id          String   @id @default(cuid())
+  key         String // mis. "login:1.2.3.4" / "post:<userId>"
+  windowStart DateTime // awal jendela waktu (dibulatkan ke windowMs)
+  count       Int      @default(0)
+
+  @@unique([key, windowStart])
+  @@index([windowStart])
+}

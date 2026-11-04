@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1500 500" width="1500" height="500" preserveAspectRatio="xMidYMid slice" role="img" aria-label="Banner emas">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#151009"/>
+      <stop offset="0.55" stop-color="#2a1d06"/>
+      <stop offset="1" stop-color="#0b0f14"/>
+    </linearGradient>
+    <pattern id="grid" width="60" height="60" patternUnits="userSpaceOnUse">
+      <path d="M60 0H0V60" fill="none" stroke="#d4a017" stroke-opacity="0.08"/>
+    </pattern>
+    <radialGradient id="glow" cx="0.8" cy="0.9" r="0.8">
+      <stop offset="0" stop-color="#d4a017" stop-opacity="0.28"/>
+      <stop offset="1" stop-color="#d4a017" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="1500" height="500" fill="url(#bg)"/>
+  <rect width="1500" height="500" fill="url(#grid)"/>
+  <rect width="1500" height="500" fill="url(#glow)"/>
+  <g stroke="#d4a017" stroke-opacity="0.5" stroke-width="6" fill="none">
+    <path d="M120 390 L280 320 L440 350 L600 230 L760 260 L920 150 L1080 190 L1240 90"/>
+  </g>
+  <g fill="#d4a017" fill-opacity="0.35">
+    <rect x="250" y="300" width="16" height="70" rx="4"/>
+    <rect x="570" y="210" width="16" height="90" rx="4"/>
+    <rect x="890" y="130" width="16" height="100" rx="4"/>
+    <rect x="1210" y="70" width="16" height="110" rx="4"/>
+  </g>
+</svg>
