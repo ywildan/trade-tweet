@@ -54,7 +54,11 @@ export function SignalCard({
     status === "SL_HIT" || pnl < 0 ? "text-short" : "text-long";
 
   return (
-    <div className="my-1.5 rounded-2xl border border-border bg-bg-elev p-3">
+    <div
+      className={`my-1.5 rounded-2xl border border-border bg-bg-elev p-3 lg:border-l-4 lg:p-4 ${
+        isLong ? "lg:border-l-long" : "lg:border-l-short"
+      }`}
+    >
       <div className="flex flex-wrap items-center gap-2">
         <Link
           href={`/symbol/${symbol}`}
@@ -83,7 +87,7 @@ export function SignalCard({
         </span>
       </div>
 
-      <div className="mt-3 grid grid-cols-2 gap-x-2 gap-y-1.5 tabular">
+      <div className="mt-3 grid grid-cols-2 gap-x-2 gap-y-1.5 tabular lg:gap-x-4 lg:gap-y-2">
         <Cell label="Entry" value={formatPrice(entry)} />
         {/* Panah mengikuti arah harga, bukan label: untuk SHORT, TP ada di
             bawah entry dan SL di atas entry — sebelumnya terbalik. */}

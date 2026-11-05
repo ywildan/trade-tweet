@@ -7,6 +7,7 @@ import {
   Bookmark,
   ChartNoAxesColumn,
   Home,
+  Search,
   Settings,
   ShieldCheck,
   UserPlus,
@@ -23,7 +24,8 @@ export type NavIconName =
   | "bookmark"
   | "analytics"
   | "admin"
-  | "settings";
+  | "settings"
+  | "search";
 
 const ICONS: Record<NavIconName, LucideIcon> = {
   home: Home,
@@ -34,6 +36,7 @@ const ICONS: Record<NavIconName, LucideIcon> = {
   analytics: ChartNoAxesColumn,
   admin: ShieldCheck,
   settings: Settings,
+  search: Search,
 };
 
 function useActive(href: string, exact: boolean) {
@@ -64,14 +67,14 @@ export function NavLink({
       title={label}
       aria-label={label}
       aria-current={active ? "page" : undefined}
-      className="flex w-fit items-center justify-center gap-4 rounded-full px-3 py-3 text-text transition-colors hover:bg-text/10 xl:w-full xl:justify-start"
+      className="flex w-fit items-center justify-center gap-4 rounded-full px-3 py-3 text-text transition-colors hover:bg-text/10 lg:w-full lg:justify-start"
     >
       <span className="relative inline-flex">
         <Icon size={26} strokeWidth={active ? 2.2 : 1.8} />
         <CountBadge count={badge} />
       </span>
       <span
-        className={`hidden text-[19px] xl:inline ${
+        className={`hidden text-[19px] lg:inline ${
           active ? "font-bold" : "font-normal"
         }`}
       >

@@ -7,16 +7,16 @@ import { RightRail } from "@/components/layout/right-rail";
 export function AppShell({ children }: { children: React.ReactNode }) {
   return (
     <>
-      <div className="mx-auto flex w-full max-w-[1265px] justify-center">
+      <div className="mx-auto flex w-full max-w-[1400px] justify-center">
         <Suspense fallback={<SidebarFallback />}>
           <NavSidebar />
         </Suspense>
 
-        <main className="min-h-screen w-full min-w-0 max-w-[600px] flex-1 border-x border-border pb-16 lg:pb-0">
+        <main className="min-h-screen w-full min-w-0 max-w-[600px] flex-1 border-x border-border pb-16 lg:max-w-[640px] lg:pb-0">
           {children}
         </main>
 
-        <aside className="hidden w-[350px] shrink-0 px-4 xl:block">
+        <aside className="hidden w-[320px] shrink-0 px-4 lg:block xl:w-[350px]">
           <Suspense fallback={<RailFallback />}>
             <RightRail />
           </Suspense>
@@ -36,7 +36,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
 function SidebarFallback() {
   return (
-    <div className="hidden w-[88px] shrink-0 lg:block xl:w-[275px]" aria-hidden />
+    <div className="hidden w-[240px] shrink-0 lg:block xl:w-[275px]" aria-hidden />
   );
 }
 

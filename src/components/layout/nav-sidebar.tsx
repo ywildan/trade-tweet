@@ -13,7 +13,7 @@ export async function NavSidebar() {
   const unread = user ? await getUnreadNotificationCount(user.id) : 0;
 
   return (
-    <aside className="sticky top-0 hidden h-screen w-[88px] shrink-0 flex-col justify-between overflow-y-auto px-2 py-3 lg:flex xl:w-[275px] xl:px-3">
+    <aside className="sticky top-0 hidden h-screen w-[240px] shrink-0 flex-col justify-between overflow-y-auto px-2 py-3 lg:flex xl:w-[275px] xl:px-3">
       <div>
         <Link
           href="/"
@@ -21,13 +21,14 @@ export async function NavSidebar() {
           className="flex w-fit items-center gap-2 rounded-full p-3 transition-colors hover:bg-text/10"
         >
           <LogoMark size={32} />
-          <span className="hidden text-[22px] font-bold tracking-tight xl:inline">
+          <span className="hidden text-[22px] font-bold tracking-tight lg:inline">
             Neural<span className="text-accent">y</span>
           </span>
         </Link>
 
-        <nav className="mt-2 space-y-1">
+        <nav className="mt-2 space-y-1" aria-label="Navigasi utama">
           <NavLink href="/" icon="home" label="Utama" exact />
+          <NavLink href="/search" icon="search" label="Cari" />
           <NavLink
             href={user ? "/notifications" : "/login?next=%2Fnotifications"}
             icon="bell"
@@ -40,15 +41,26 @@ export async function NavSidebar() {
             label="Simpanan"
           />
           <NavLink
-            href={user ? "/dashboard" : "/login?next=%2Fdashboard"}
-            icon="analytics"
-            label="Analitik"
-          />
-          <NavLink
             href={user ? `/@${user.username}` : "/login"}
             icon="user"
             label={user ? "Profil" : "Masuk"}
             exact
+          />
+        </nav>
+
+        {/* Seksi trading — dipisah visual dari nav utama agar sidebar
+            desktop terasa seperti panel trading, bukan daftar ikon X. */}
+        <p
+          aria-hidden
+          className="mt-5 px-3 text-[12px] font-semibold uppercase tracking-wider text-text-muted"
+        >
+          Trading
+        </p>
+        <nav className="mt-1 space-y-1" aria-label="Navigasi trading">
+          <NavLink
+            href={user ? "/dashboard" : "/login?next=%2Fdashboard"}
+            icon="analytics"
+            label="Analitik"
           />
           {user && (
             <NavLink
@@ -71,15 +83,15 @@ export async function NavSidebar() {
         <Link
           href={user ? "/compose" : "/login?next=%2Fcompose"}
           title="Buat postingan"
-          className="mt-4 flex h-12 w-12 items-center justify-center rounded-full bg-accent font-semibold text-white transition-colors hover:bg-accent-hover xl:w-full"
+          className="mt-4 flex h-12 w-12 items-center justify-center rounded-full bg-accent font-semibold text-white transition-colors hover:bg-accent-hover lg:w-full"
         >
-          <PenLine size={22} className="xl:hidden" />
-          <span className="hidden xl:inline">Posting</span>
+          <PenLine size={22} className="lg:hidden" />
+          <span className="hidden lg:inline">Posting</span>
         </Link>
       </div>
 
       <div className="mt-4 space-y-2">
-        <div className="flex justify-center xl:justify-start xl:px-1">
+        <div className="flex justify-center lg:justify-start lg:px-1">
           <ThemeToggle />
         </div>
 
@@ -93,7 +105,7 @@ export async function NavSidebar() {
             }}
           />
         ) : (
-          <div className="space-y-2 xl:px-1">
+          <div className="space-y-2 lg:px-1">
             <Link href="/login" className="block">
               <Button className="w-full">Masuk</Button>
             </Link>
