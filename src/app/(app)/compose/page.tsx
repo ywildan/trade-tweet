@@ -23,7 +23,9 @@ export default async function ComposePage({ searchParams }: PageProps) {
 
   const params = await searchParams;
   const rawQuote = Array.isArray(params.quote) ? params.quote[0] : params.quote;
-  const detail = rawQuote ? await getPostDetail(rawQuote, user.id) : null;
+  const detail = rawQuote
+    ? await getPostDetail(rawQuote, user.id, { repliesTake: 0 })
+    : null;
   const quoteMissing = Boolean(rawQuote) && !detail;
 
   return (

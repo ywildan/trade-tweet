@@ -40,10 +40,13 @@ export async function recordProfileView(
   }
 }
 
-export async function recordPostView(
-  postId: string,
+/**
+ * Konteks dedupe view: dibaca saat render, lalu dioper sebagai primitif
+ * (aman dipakai di dalam after(), yang tidak boleh memanggil headers()).
+ */
+export async function getPostViewContext(
   userId: string | null,
-): Promise<boolean> {
+): Promise<{ viewerKey: string; day: string }> {
   const headerStore = await headers();
   // Entri terakhir X-Forwarded-For (lihat requestKey di rate-limit.ts):
   // entri pertama dikendalikan pengirim dan bisa diputar untuk
@@ -60,7 +63,18 @@ export async function recordPostView(
   const viewerKey =
     userId ?? createHash("sha256").update(ip).digest("hex").slice(0, 32);
   const day = new Date().toISOString().slice(0, 10);
+  return { viewerKey, day };
+}
 
+/**
+ * Tulis satu view dengan konteks yang sudah dibaca. Dedupe tetap sama:
+ * satu baris per (post, viewerKey, hari); duplikat (P2002) bukan view baru.
+ */
+export async function recordPostViewWithContext(
+  postId: string,
+  viewerKey: string,
+  day: string,
+): Promise<boolean> {
   try {
     await prisma.postView.create({
       data: { postId, viewerKey, day, count: 1 },
@@ -78,4 +92,12 @@ export async function recordPostView(
     if (code === "P2002") return false;
     throw error;
   }
+}
+
+export async function recordPostView(
+  postId: string,
+  userId: string | null,
+): Promise<boolean> {
+  const { viewerKey, day } = await getPostViewContext(userId);
+  return recordPostViewWithContext(postId, viewerKey, day);
 }
