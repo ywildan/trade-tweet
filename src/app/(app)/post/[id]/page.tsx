@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
+import { after } from "next/server";
 import { BackButton } from "@/components/ui/back-button";
 import { headers } from "next/headers";
 import Link from "next/link";
@@ -11,17 +13,18 @@ import { ComposeBox } from "@/components/post/compose-box";
 import { PostActions } from "@/components/post/post-actions";
 import { ShareResultButton } from "@/components/post/share-result-button";
 import { SignalResolveForm } from "@/components/post/signal-resolve-form";
-import { PostCard, QuoteCard, RichContent } from "@/components/post/post-card";
+import { QuoteCard, RichContent } from "@/components/post/post-card";
+import { RepliesList } from "@/components/post/replies-list";
 import { SignalCard } from "@/components/post/signal-card";
 import { hasSignalShape } from "@/lib/post-guards";
 import { getPostAnalytics } from "@/lib/analytics";
 import { formatCount, formatPostDate, formatRelativeTime } from "@/lib/format";
-import { getPostDetail } from "@/lib/posts";
+import { getPostDetail, getPostReplies, getPostRow } from "@/lib/posts";
 import { getSession } from "@/lib/session";
-import { recordPostView } from "@/lib/views";
-import { prisma } from "@/lib/db";
-
-export const instant = false;
+import {
+  getPostViewContext,
+  recordPostViewWithContext,
+} from "@/lib/views";
 
 type PageProps = { params: Promise<{ id: string }> };
 
@@ -29,15 +32,8 @@ export async function generateMetadata({
   params,
 }: PageProps): Promise<Metadata> {
   const { id } = await params;
-  const row = await prisma.post.findFirst({
-    where: { id, deletedAt: null },
-    select: {
-      content: true,
-      isSignal: true,
-      symbol: true,
-      author: { select: { name: true, username: true } },
-    },
-  });
+  // Satu query dengan halaman (React cache di getPostRow).
+  const row = await getPostRow(id);
 
   if (!row) return { title: "Postingan tidak ditemukan" };
 
@@ -87,22 +83,37 @@ export async function generateMetadata({
 
 export default async function PostPage({ params }: PageProps) {
   const { id } = await params;
-  const session = await getSession();
-  const detail = await getPostDetail(id, session?.user.id ?? null);
+  // Sesi (JWT, tanpa query DB) dan baris post jalan bersamaan; baris post
+  // dipakai lagi oleh getPostDetail lewat cache yang sama.
+  const [session, row] = await Promise.all([getSession(), getPostRow(id)]);
+  if (!row) notFound();
+  // Balasan tidak ikut di sini (repliesTake 0): dimuat seksi streaming
+  // sendiri di bawah, supaya konten postingan tidak menunggunya.
+  const detail = await getPostDetail(id, session?.user.id ?? null, {
+    repliesTake: 0,
+  });
   if (!detail) notFound();
 
-  let viewed = false;
-  try {
-    viewed = await recordPostView(id, session?.user.id ?? null);
-  } catch {
-    // Kegagalan pencatatan view tidak boleh menggagalkan halaman.
-  }
+  // Konteks view dibaca saat render; pencatatan jalan setelah response
+  // terkirim (after) dan tidak menahan render. Angka views yang tampil
+  // adalah kolom views — boleh tertinggal 1 di kunjungan pertama.
+  const viewContext = await getPostViewContext(session?.user.id ?? null);
+  after(async () => {
+    try {
+      await recordPostViewWithContext(
+        id,
+        viewContext.viewerKey,
+        viewContext.day,
+      );
+    } catch {
+      // Kegagalan pencatatan view tidak boleh menggagalkan halaman.
+    }
+  });
 
-  const { post, replies, parent } = detail;
+  const { post, parent } = detail;
+  const viewerId = session?.user.id ?? null;
   const signal = hasSignalShape(post) ? post : null;
-  const views = post.views + (viewed ? 1 : 0);
   const isOwner = session?.user.id === post.author.id;
-  const analytics = isOwner ? await getPostAnalytics(post.id) : null;
 
   const replyTarget = parent
     ? {
@@ -216,7 +227,7 @@ export default async function PostPage({ params }: PageProps) {
 
             <div className="mt-3 flex flex-wrap gap-x-5 gap-y-1 border-y border-border py-3 text-[13px] text-text-muted">
               <span>
-                <b className="text-text">{formatCount(views)}</b> tayangan
+                <b className="text-text">{formatCount(post.views)}</b> tayangan
               </span>
               <span>
                 <b className="text-text">{formatCount(post.counts.reposts)}</b>{" "}
@@ -236,41 +247,10 @@ export default async function PostPage({ params }: PageProps) {
               </span>
             </div>
 
-            {isOwner && analytics && (
-              <section className="mt-3 rounded-xl border border-border bg-bg-elev p-3">
-                <div className="flex items-center justify-between gap-2">
-                  <h2 className="text-[15px] font-semibold">
-                    Analitik postingan
-                  </h2>
-                  <Link
-                    href="/dashboard"
-                    className="text-[13px] text-accent hover:underline"
-                  >
-                    Dashboard
-                  </Link>
-                </div>
-                <div className="mt-2 grid grid-cols-3 gap-1 text-center sm:grid-cols-5">
-                  {[
-                    { label: "Tayangan", value: analytics.views },
-                    { label: "Suka", value: analytics.likes },
-                    { label: "Repost", value: analytics.reposts },
-                    { label: "Simpan", value: analytics.bookmarks },
-                    { label: "Balasan", value: analytics.replies },
-                  ].map((item) => (
-                    <div
-                      key={item.label}
-                      className="rounded-xl bg-bg-input px-1 py-2"
-                    >
-                      <div className="text-[15px] font-bold tabular">
-                        {formatCount(item.value)}
-                      </div>
-                      <div className="text-[11px] text-text-muted">
-                        {item.label}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </section>
+            {isOwner && (
+              <Suspense fallback={null}>
+                <PostAnalyticsSection postId={post.id} />
+              </Suspense>
             )}
 
             <p className="mt-3 text-[13px] text-text-muted">
@@ -331,13 +311,94 @@ export default async function PostPage({ params }: PageProps) {
         )}
       </section>
 
-      {replies.length > 0 ? (
-        replies.map((reply) => <PostCard key={reply.id} post={reply} />)
-      ) : (
-        <p className="px-4 py-10 text-center text-[15px] text-text-muted">
-          Belum ada balasan. Tulis balasan di atas untuk memulai diskusi.
-        </p>
-      )}
+      <Suspense
+        fallback={
+          <p className="px-4 py-10 text-center text-[15px] text-text-muted">
+            Memuat balasan…
+          </p>
+        }
+      >
+        <RepliesSection
+          postId={post.id}
+          viewerId={viewerId}
+          totalReplies={post.counts.replies}
+          isRoot={post.replyToId === null}
+        />
+      </Suspense>
     </>
+  );
+}
+
+/** Panel analitik owner: streaming terpisah, tidak menahan konten postingan. */
+async function PostAnalyticsSection({ postId }: { postId: string }) {
+  const analytics = await getPostAnalytics(postId);
+  if (!analytics) return null;
+
+  return (
+    <section className="mt-3 rounded-xl border border-border bg-bg-elev p-3">
+      <div className="flex items-center justify-between gap-2">
+        <h2 className="text-[15px] font-semibold">Analitik postingan</h2>
+        <Link
+          href="/dashboard"
+          className="text-[13px] text-accent hover:underline"
+        >
+          Dashboard
+        </Link>
+      </div>
+      <div className="mt-2 grid grid-cols-3 gap-1 text-center sm:grid-cols-5">
+        {[
+          { label: "Tayangan", value: analytics.views },
+          { label: "Suka", value: analytics.likes },
+          { label: "Repost", value: analytics.reposts },
+          { label: "Simpan", value: analytics.bookmarks },
+          { label: "Balasan", value: analytics.replies },
+        ].map((item) => (
+          <div
+            key={item.label}
+            className="rounded-xl bg-bg-input px-1 py-2"
+          >
+            <div className="text-[15px] font-bold tabular">
+              {formatCount(item.value)}
+            </div>
+            <div className="text-[11px] text-text-muted">{item.label}</div>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+/**
+ * Balasan halaman pertama (20). Dimuat di sini, bukan di getPostDetail,
+ * supaya header + postingan + kolom tulis tampil dulu.
+ * Perilaku lama dipertahankan: halaman sebuah balasan tidak menampilkan
+ * balasan di bawahnya (balasan di situ membalas induknya).
+ */
+async function RepliesSection({
+  postId,
+  viewerId,
+  totalReplies,
+  isRoot,
+}: {
+  postId: string;
+  viewerId: string | null;
+  totalReplies: number;
+  isRoot: boolean;
+}) {
+  if (!isRoot) {
+    return (
+      <p className="px-4 py-10 text-center text-[15px] text-text-muted">
+        Belum ada balasan. Tulis balasan di atas untuk memulai diskusi.
+      </p>
+    );
+  }
+  const { items, nextCursor } = await getPostReplies(postId, viewerId, 20);
+  return (
+    <RepliesList
+      postId={postId}
+      initialReplies={items}
+      initialNextCursor={nextCursor}
+      totalReplies={totalReplies}
+    />
   );
 }

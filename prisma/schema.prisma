@@ -113,6 +113,7 @@ model Like     {
   post Post @relation(fields: [postId], references: [id])
 
   @@unique([userId, postId])
+  @@index([postId])
 }
 
 model Repost   {
@@ -125,6 +126,7 @@ model Repost   {
   post Post @relation(fields: [postId], references: [id])
 
   @@unique([userId, postId])
+  @@index([postId])
 }
 
 model Bookmark {
@@ -137,6 +139,7 @@ model Bookmark {
   post Post @relation(fields: [postId], references: [id])
 
   @@unique([userId, postId])
+  @@index([postId])
 }
 
 model Follow {

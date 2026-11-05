@@ -1,3 +1,4 @@
+import { cache } from "react";
 import type { Prisma } from "@/generated/prisma/client";
 import { prisma } from "@/lib/db";
 import type {
@@ -51,6 +52,18 @@ type PostRow = Prisma.PostGetPayload<{ include: typeof postInclude }>;
 type PostAuthorRow = Pick<PostRow["author"], "id" | "username" | "name" | "avatarUrl"> & {
   badges: Array<{ type: string }>;
 };
+
+/**
+ * Satu query baris post per request (React cache): dipakai generateMetadata
+ * dan getPostDetail supaya metadata + halaman tidak query post yang sama 2x.
+ * Nilai yang dikembalikan dipakai bersama; pemanggil tidak boleh mengubahnya.
+ */
+export const getPostRow = cache(async (id: string) => {
+  return prisma.post.findFirst({
+    where: { id, deletedAt: null },
+    include: postInclude,
+  });
+});
 
 function toAuthor(row: PostAuthorRow): PostAuthor {
   return {
@@ -284,23 +297,32 @@ export async function getFeed({
   };
 }
 
+/**
+ * Detail satu post. `repliesTake` membatasi balasan yang ikut dimuat
+ * (default 20); 0 berarti tanpa balasan — dipakai halaman detail yang
+ * memuat balasan lewat seksi streaming sendiri supaya tidak dihitung 2x.
+ * Pemakai lain (API detail, compose untuk kutipan) memakai default.
+ */
 export async function getPostDetail(
   id: string,
   viewerId: string | null,
+  options?: { repliesTake?: number },
 ): Promise<PostDetail | null> {
-  const row = await prisma.post.findFirst({
-    where: { id, deletedAt: null },
-    include: postInclude,
-  });
+  const row = await getPostRow(id);
   if (!row) return null;
 
+  const repliesTake = Math.min(
+    Math.max(options?.repliesTake ?? 20, 0),
+    100,
+  );
+
   const [replies, parent] = await Promise.all([
-    row.replyToId
+    repliesTake === 0 || row.replyToId
       ? Promise.resolve([])
       : prisma.post.findMany({
           where: { replyToId: id, deletedAt: null },
           orderBy: { createdAt: "asc" },
-          take: 100,
+          take: repliesTake,
           include: postInclude,
         }),
     row.replyToId
@@ -406,19 +428,31 @@ export async function getUserBookmarks(
   return serializeList(posts, viewerId);
 }
 
-/** Balasan sebuah thread root, untuk GET /api/posts/[id]/replies. */
+/**
+ * Balasan sebuah thread root, untuk GET /api/posts/[id]/replies.
+ * Urut waktu naik; `cursor` = id balasan terakhir halaman sebelumnya.
+ * Mengembalikan satu halaman + cursor berikutnya (null bila habis).
+ */
 export async function getPostReplies(
   postId: string,
   viewerId: string | null,
-  take = 100,
-): Promise<FeedPost[]> {
+  take = 20,
+  cursor?: string | null,
+): Promise<{ items: FeedPost[]; nextCursor: string | null }> {
+  const takeClamped = Math.min(Math.max(take, 1), 100);
   const rows = await prisma.post.findMany({
     where: { replyToId: postId, deletedAt: null },
     orderBy: { createdAt: "asc" },
-    take,
+    take: takeClamped + 1,
+    ...(cursor ? { cursor: { id: cursor }, skip: 1 } : {}),
     include: postInclude,
   });
-  return serializeList(rows, viewerId);
+  const page = rows.slice(0, takeClamped);
+  return {
+    items: await serializeList(page, viewerId),
+    nextCursor:
+      rows.length > takeClamped ? page[page.length - 1].id : null,
+  };
 }
 
 /** Pencarian isi post (spesifikasi.md §4 Phase 6). */
