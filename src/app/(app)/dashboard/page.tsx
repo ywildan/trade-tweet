@@ -84,7 +84,7 @@ export default async function DashboardPage() {
         </div>
       </header>
 
-      <section className="grid gap-3 border-b border-border p-4 sm:grid-cols-2">
+      <section className="grid gap-3 border-b border-border p-4 sm:grid-cols-2 lg:gap-4 lg:p-6">
         <StatTile
           label="Tayangan"
           value={formatCount(summary.views.total)}
@@ -167,11 +167,11 @@ export default async function DashboardPage() {
         </div>
       </section>
 
-      <section className="border-b border-border px-4 py-4">
+      <section className="border-b border-border px-4 py-4 lg:px-6">
         <h2 className="text-[20px] font-bold">Grafik {summary.periodDays} hari</h2>
 
-        <div className="mt-3 space-y-3">
-          <div className="rounded-2xl border border-border bg-bg-elev p-4">
+        <div className="mt-3 grid gap-3 lg:grid-cols-2">
+          <div className="min-w-0 rounded-2xl border border-border bg-bg-elev p-4">
             <div className="flex items-baseline justify-between gap-3">
               <h3 className="text-[15px] font-semibold">Tayangan per hari</h3>
               <span className="text-[13px] text-text-muted">
@@ -186,7 +186,7 @@ export default async function DashboardPage() {
             />
           </div>
 
-          <div className="rounded-2xl border border-border bg-bg-elev p-4">
+          <div className="min-w-0 rounded-2xl border border-border bg-bg-elev p-4">
             <div className="flex items-baseline justify-between gap-3">
               <h3 className="text-[15px] font-semibold">Interaksi per hari</h3>
               <span className="text-[13px] text-text-muted">

@@ -194,7 +194,7 @@ async function ProfileView({
         )}
       </div>
 
-      <div className="px-4 pb-4">
+      <div className="px-4 pb-4 lg:px-6">
         {/*
           Avatar harus di atas banner: banner di atas adalah elemen
           `relative`, sehingga tanpa posisi + z-index di sini, separuh
@@ -253,7 +253,7 @@ async function ProfileView({
             </span>
           </div>
 
-          <div className="mt-4 grid grid-cols-3 gap-2">
+          <div className="mt-4 grid grid-cols-3 gap-2 lg:gap-3">
             <MiniStat
               label="Win-rate"
               value={`${Math.round((stats?.winRate ?? 0) * 100)}%`}

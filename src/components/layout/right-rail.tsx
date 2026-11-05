@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Flame, TrendingUp, Trophy } from "lucide-react";
+import { Flame, Target, TrendingUp, Trophy } from "lucide-react";
 import { SearchForm } from "@/components/search/search-form";
 import { UserCard } from "@/components/user/user-card";
 import { prisma } from "@/lib/db";
@@ -61,9 +61,40 @@ export async function RightRail() {
     }),
   ]);
 
+  const topSignal = trending[0] ?? null;
+
   return (
     <div className="space-y-4 py-2">
       <SearchForm />
+
+      {/* Panel trading: sorotan satu sinyal teratas hari ini, dari data
+          trending yang sama — bukan query baru, bukan duplikat daftar
+          "Simbol trending" di bawahnya. */}
+      {topSignal && (
+        <RailCard
+          icon={<Target size={18} className="text-long" />}
+          title="Sinyal top hari ini"
+        >
+          <Link
+            href={`/symbol/${topSignal.symbol}`}
+            className="block rounded-xl border-l-2 border-long bg-bg px-3 py-2.5 transition-colors hover:bg-text/[0.03]"
+          >
+            <span className="block text-[19px] font-bold leading-6">
+              ${topSignal.symbol}
+            </span>
+            <span className="mt-0.5 block truncate text-[13px] text-text-muted">
+              {topSignal.name ?? topSignal.market}
+            </span>
+            <span className="mt-1.5 block text-[13px]">
+              <b className="text-long">{topSignal.signals} sinyal</b>
+              <span className="text-text-muted"> · 7 hari terakhir</span>
+            </span>
+            <span className="mt-1 block text-[13px] font-semibold text-accent">
+              Lihat sinyal →
+            </span>
+          </Link>
+        </RailCard>
+      )}
 
       <RailCard
         icon={<Flame size={18} className="text-short" />}

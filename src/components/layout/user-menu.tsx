@@ -56,7 +56,7 @@ export function UserMenu({
         className="flex w-full items-center gap-3 rounded-full p-2 text-left transition-colors hover:bg-text/10"
       >
         <Avatar name={user.name} src={user.avatarUrl} size={40} />
-        <span className="hidden min-w-0 flex-1 xl:block">
+        <span className="hidden min-w-0 flex-1 lg:block">
           <span className="block truncate text-[15px] font-semibold">
             {user.name}
           </span>
@@ -64,7 +64,7 @@ export function UserMenu({
             @{user.username}
           </span>
         </span>
-        <span className="hidden text-text-muted xl:inline">⋯</span>
+        <span className="hidden text-text-muted lg:inline">⋯</span>
       </button>
 
       {open && (

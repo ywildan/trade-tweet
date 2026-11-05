@@ -37,10 +37,19 @@ export function PostCard({
   // dalamnya (tidak valid) dan merusak klik-tengah/buka-tab-baru. Akses
   // keyboard ke detail tetap ada lewat tautan waktu di bawah, klik mouse
   // di area kosong tetap membuka detail lewat openPost.
+  //
+  // Desktop: postingan sinyal tampil sebagai kartu ber-border (bukan baris
+  // flat ala X) supaya sinyal — konten utama Neuraly — menonjol dari
+  // teks biasa. Postingan teks biasa tetap flat. Mobile tidak berubah.
+  const isSignalPost = hasSignalShape(post);
   return (
     <article
       onClick={openPost}
-      className="group relative cursor-pointer border-b border-border p-4 transition-colors duration-150 hover:bg-text/[0.03] focus-visible:bg-text/[0.03] focus-visible:outline-none"
+      className={`group relative cursor-pointer border-b border-border p-4 transition-colors duration-150 hover:bg-text/[0.03] focus-visible:bg-text/[0.03] focus-visible:outline-none ${
+        isSignalPost
+          ? "lg:mx-3 lg:my-3 lg:rounded-2xl lg:border lg:border-border lg:bg-bg-elev/40"
+          : ""
+      }`}
     >
       <div className="flex gap-3">
         <Link

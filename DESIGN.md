@@ -26,14 +26,16 @@
 
 | Breakpoint | Behaviour |
 |---|---|
-| `< 1024px` (mobile/tablet portrait) | Sidebar kiri = **bottom nav bar** ikon saja; sidebar kanan SEMBUNYI. Tombol Post = **FAB** (floating action button) kanan-bawah. |
-| `1024–1280px` | Sidebar kiri ikon saja (tanpa label); kolom tengah; sidebar kanan `hidden xl:block`. |
-| `>= 1280px` | Full layout; sidebar kiri dengan label. |
-| Max-width seluruh area konten | 1265px, centered. |
+| `< 1024px` (mobile/tablet portrait) | Sidebar kiri = **bottom nav bar** ikon saja; sidebar kanan SEMBUNYI. Tombol Post = **FAB** (floating action button) kanan-bawah. Feed flat seperti sebelumnya. |
+| `1024–1280px` | Sidebar kiri **dengan label** (240px, seksi utama + seksi Trading); kolom tengah 640px; sidebar kanan **tampil** (320px, panel trading). |
+| `>= 1280px` | Full layout; sidebar kiri 275px dengan label; kolom tengah 640px; sidebar kanan 350px. |
+| Max-width seluruh area konten | 1400px, centered. |
 
 - Sticky topbar di kolom tengah: `backdrop-blur` + background alpha 65% (seperti X); tinggi 53px.
 - Border antar item feed & kolom = 1px warna `--border`.
-- Konten tengah (`<main>`): `min-height: 100vh`, `border-x` 1px, tidak pernah lebih lebar 600px.
+- Konten tengah (`<main>`): `min-height: 100vh`, `border-x` 1px, tidak pernah lebih lebar 600px di mobile dan 640px di desktop (`>= 1024px`).
+
+**Diferensiasi desktop (bukan klon X 1:1):** di desktop, feed diawali strip ticker pasar (simbol trending, hanya `lg+`); postingan sinyal tampil sebagai **kartu** ber-border radius 16 dengan aksen kiri hijau/merah (LONG/SHORT), sedangkan postingan teks biasa tetap flat; sidebar kiri memisahkan nav utama dan nav Trading; right rail adalah panel trading (pencarian, sinyal top hari ini, simbol trending, trader teratas, siapa diikuti). Mobile (`< 1024px`) tetap bottom nav + feed flat seperti sebelumnya.
 
 ---
 

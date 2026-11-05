@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { LogoMark } from "@/components/ui/logo";
 import { ComposeLauncher } from "@/components/post/compose-launcher";
+import { DesktopTicker } from "@/components/layout/desktop-ticker";
 import { Feed } from "@/components/post/feed";
 import { getFeed, type FeedTab } from "@/lib/posts";
 import { getSessionUser } from "@/lib/session";
@@ -39,6 +40,10 @@ export default function HomePage({
           <ThemeToggle />
         </div>
       </header>
+
+      <Suspense fallback={null}>
+        <DesktopTicker />
+      </Suspense>
 
       <Suspense fallback={<HomeSkeleton />}>
         <HomeContent searchParams={searchParams} />
