@@ -31,9 +31,15 @@ Build produksi:
 
 ```bash
 pnpm db:deploy            # prisma migrate deploy (wajib sebelum start)
-pnpm build
+pnpm build                # = prisma generate && next build
 pnpm start
 ```
+
+Catatan build: skrip `build` sengaja menjalankan `prisma generate`
+dulu — client Prisma di `src/generated/prisma` tidak masuk Git, dan
+install yang ter-cache di Vercel ("Already up to date") tidak menjalankan
+ulang `postinstall`, sehingga `next build` saja gagal dengan "Module not
+found: Can't resolve '@/generated/prisma/client'".
 
 Catatan produksi: `CRON_SECRET` wajib diisi, kalau tidak kedua cron
 menolak dengan 500. Perhatian: `vercel.json` sengaja HANYA mendaftarkan
