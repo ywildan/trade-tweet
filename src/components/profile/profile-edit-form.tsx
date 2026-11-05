@@ -121,7 +121,7 @@ export function ProfileEditForm({ user }: { user: EditableUser }) {
         </p>
       )}
 
-      <section className="overflow-hidden rounded-2xl border border-border bg-bg-elev/50">
+      <section className="overflow-hidden rounded-xl border border-border bg-bg-elev">
         <div className="relative aspect-[3/1] w-full bg-bg-input">
           {bannerPreview ? (
             // eslint-disable-next-line @next/next/no-img-element
@@ -131,13 +131,7 @@ export function ProfileEditForm({ user }: { user: EditableUser }) {
               className="h-full w-full object-cover"
             />
           ) : (
-            <div
-              className="h-full w-full"
-              style={{
-                background:
-                  "linear-gradient(135deg, rgba(29,155,240,0.35), rgba(0,186,124,0.22) 55%, rgba(0,0,0,0))",
-              }}
-            />
+            <div className="h-full w-full bg-bg-elev" aria-hidden />
           )}
           <div className="absolute -bottom-10 left-4">
             <Avatar

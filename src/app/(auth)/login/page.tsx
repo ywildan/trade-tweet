@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Suspense } from "react";
+import { AlertCircle } from "lucide-react";
 import { LoginForm } from "@/components/auth/login-form";
 import { AuthDivider, OAuthButtons } from "@/components/auth/oauth-buttons";
 import { enabledOAuthProviders } from "@/lib/oauth";
@@ -57,9 +58,10 @@ export default async function LoginPage({
       {oauthError && (
         <p
           role="alert"
-          className="mt-4 rounded-lg border border-short/40 bg-short/10 px-3 py-2 text-[13px] text-short"
+          className="mt-4 flex items-start gap-2 rounded-lg border border-short/40 bg-short/10 px-3 py-2 text-[13px] text-short"
         >
-          {oauthError}
+          <AlertCircle size={16} aria-hidden="true" className="mt-0.5 shrink-0" />
+          <span>{oauthError}</span>
         </p>
       )}
 
@@ -93,9 +95,9 @@ export default async function LoginPage({
 function FormSkeleton() {
   return (
     <div className="space-y-4" aria-hidden>
-      <div className="h-[70px] animate-pulse rounded-lg bg-bg-input" />
-      <div className="h-[70px] animate-pulse rounded-lg bg-bg-input" />
-      <div className="h-10 animate-pulse rounded-2xl bg-bg-input" />
+      <div className="h-[70px] rounded-lg bg-bg-input" />
+      <div className="h-[70px] rounded-lg bg-bg-input" />
+      <div className="h-11 rounded-lg bg-bg-input" />
     </div>
   );
 }

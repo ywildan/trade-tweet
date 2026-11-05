@@ -12,7 +12,7 @@ function Section({ title, children }: { title: string; children: React.ReactNode
   return (
     <section className="mt-8">
       <h2 className="text-[19px] font-bold">{title}</h2>
-      <div className="mt-2 space-y-3 text-[15px] leading-7 text-text-muted">
+      <div className="mt-2 space-y-3 text-[15px] leading-7 text-text">
         {children}
       </div>
     </section>
@@ -21,7 +21,7 @@ function Section({ title, children }: { title: string; children: React.ReactNode
 
 export default function TermsPage() {
   return (
-    <main className="mx-auto w-full max-w-[640px] px-5 py-10">
+    <main className="mx-auto w-full max-w-[640px] px-5 pb-16 pt-10">
       <Logo size={36} />
       <h1 className="mt-6 text-[28px] font-bold leading-9">Syarat Layanan</h1>
       <p className="mt-1 text-[14px] text-text-muted">

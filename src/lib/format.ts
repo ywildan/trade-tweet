@@ -1,5 +1,5 @@
 /**
- * formatCount — angka ringkas ala X.com, lokal Indonesia (DESIGN.md §2.2).
+ * formatCount: angka ringkas, lokal Indonesia.
  * 999      -> "999"
  * 1234     -> "1,2 rb"
  * 2300000  -> "2,3 jt"

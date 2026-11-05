@@ -30,7 +30,7 @@ import { recordProfileView } from "@/lib/views";
 // Profil harus menunggu DB agar username tak dikenal bisa mengembalikan 404 asli.
 export const instant = false;
 
-/** Parameter page bisa tiba sebagai "%40handle" — metadata sudah ter-decode. */
+/** Parameter page bisa tiba sebagai "%40handle", metadata sudah ter-decode. */
 function decodeHandle(value: string) {
   try {
     return decodeURIComponent(value);
@@ -119,9 +119,7 @@ async function ProfileView({
       : Promise.resolve(false),
   ]);
 
-  // Tayangan profil (§7): sebelumnya tabel ProfileView tidak pernah ditulis,
-  // sehingga DailyStat.profileViews selalu 0. Gagal mencatat tidak boleh
-  // menggagalkan halaman profil.
+  // Tayangan profil: gagal mencatat tidak boleh menggagalkan halaman.
   if (!isSelf) {
     try {
       await recordProfileView(user.id, viewerId);
@@ -164,7 +162,7 @@ async function ProfileView({
 
   return (
     <>
-      <header className="sticky top-0 z-20 flex h-[53px] items-center gap-4 border-b border-border bg-bg/65 px-3 backdrop-blur">
+      <header className="sticky top-0 z-20 flex h-[53px] items-center gap-4 border-b border-border bg-bg px-3">
         <BackButton />
         <div className="min-w-0">
           <h1 className="truncate text-[20px] font-bold leading-6">{user.name}</h1>
@@ -184,23 +182,12 @@ async function ProfileView({
             className="h-full w-full object-cover"
           />
         ) : (
-          <div
-            className="h-full w-full"
-            style={{
-              background:
-                "linear-gradient(135deg, rgba(29,155,240,0.35), rgba(0,186,124,0.22) 55%, rgba(0,0,0,0))",
-            }}
-          />
+          <div className="h-full w-full bg-bg-elev" aria-hidden />
         )}
       </div>
 
       <div className="px-4 pb-4 lg:px-6">
-        {/*
-          Avatar harus di atas banner: banner di atas adalah elemen
-          `relative`, sehingga tanpa posisi + z-index di sini, separuh
-          avatar yang menumpuk banner (-mt-60px) akan tertutup banner
-          dan terlihat seperti logo terpotong.
-        */}
+        {/* Avatar menumpuk banner, jadi butuh posisi dan z-index di sini. */}
         <div className="relative z-10 -mt-[60px] flex items-end justify-between gap-3">
           <Avatar
             name={user.name}
@@ -263,22 +250,16 @@ async function ProfileView({
               value={String(stats?.totalSignals ?? 0)}
             />
             <MiniStat
-              label="Avg PnL"
+              label={`Avg PnL · ${(stats?.avgPnl ?? 0) >= 0 ? "untung" : "rugi"}`}
               value={formatPnl(stats?.avgPnl ?? 0)}
-              tone={(stats?.avgPnl ?? 0) >= 0 ? "long" : "short"}
             />
           </div>
 
-          {/*
-            Pengganti item nav Analitik yang dihapus dari bottom nav:
-            hanya untuk profil sendiri, karena dashboard memang khusus
-            pemilik akun. Kelola profil tidak perlu tautan kedua di sini
-            karena tombol "Edit profil" di atas sudah mengarah ke sana.
-          */}
+          {/* Tautan analitik hanya untuk profil sendiri. */}
           {isSelf && (
             <Link
               href="/dashboard"
-              className="mt-3 flex items-center justify-between rounded-2xl border border-border bg-bg-elev px-3 py-2.5 text-[15px] font-semibold transition-colors hover:bg-text/[0.03]"
+              className="mt-3 flex min-h-11 items-center justify-between rounded-xl border border-border bg-bg-elev px-3 py-2.5 text-[15px] font-semibold transition-colors hover:bg-text/[0.03]"
             >
               <span className="inline-flex items-center gap-2">
                 <ChartNoAxesColumn
@@ -300,7 +281,7 @@ async function ProfileView({
 
       <nav
         aria-label="Tab profil"
-        className="sticky top-[53px] z-10 flex border-b border-border bg-bg/85 backdrop-blur"
+        className="sticky top-[53px] z-10 flex border-b border-border bg-bg"
       >
         {visibleTabs.map((item) => {
           const active = item.id === tab;
@@ -370,23 +351,11 @@ function ProfileAction({
   );
 }
 
-function MiniStat({
-  label,
-  value,
-  tone,
-}: {
-  label: string;
-  value: string;
-  tone?: "long" | "short";
-}) {
+function MiniStat({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-2xl border border-border bg-bg-elev px-3 py-2.5">
+    <div className="rounded-xl border border-border bg-bg-elev px-3 py-2.5">
       <div className="text-[12px] text-text-muted">{label}</div>
-      <div
-        className={`mt-0.5 text-[17px] font-bold tabular ${
-          tone === "long" ? "text-long" : tone === "short" ? "text-short" : ""
-        }`}
-      >
+      <div className="mt-0.5 text-[17px] font-bold tabular text-text">
         {value}
       </div>
     </div>

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Field, inputClass } from "@/components/ui/form";
 import { firstFieldErrors, registerSchema } from "@/lib/validation";
@@ -93,9 +94,10 @@ export function RegisterForm() {
       {message && (
         <p
           role="alert"
-          className="rounded-lg border border-short/40 bg-short/10 px-3 py-2 text-[13px] text-short"
+          className="flex items-start gap-2 rounded-lg border border-short/40 bg-short/10 px-3 py-2 text-[13px] text-short"
         >
-          {message}
+          <AlertCircle size={16} aria-hidden="true" className="mt-0.5 shrink-0" />
+          <span>{message}</span>
         </p>
       )}
 
@@ -119,7 +121,7 @@ export function RegisterForm() {
         error={errors.username}
       >
         <div className="flex items-center rounded-lg border border-border bg-bg-input focus-within:border-accent">
-          <span className="pl-3 text-text-muted">@</span>
+          <span className="pl-3 text-text" aria-hidden="true">@</span>
           <input
             id="username"
             name="username"
@@ -127,7 +129,7 @@ export function RegisterForm() {
             value={form.username}
             onChange={update("username")}
             placeholder="namakamu"
-            className="w-full bg-transparent px-1.5 py-2.5 text-[15px] text-text placeholder:text-text-muted outline-none"
+            className="w-full bg-transparent px-1.5 py-2.5 text-[15px] text-text placeholder:text-text-muted"
             maxLength={15}
           />
         </div>
@@ -183,8 +185,8 @@ export function RegisterForm() {
         />
       </Field>
 
-      <Button type="submit" className="w-full" disabled={pending}>
-        {pending ? "Membuat akun…" : "Daftar"}
+      <Button type="submit" className="min-h-11 w-full" disabled={pending}>
+        {pending ? "Membuat akun…" : "Buat akun Neuraly"}
       </Button>
     </form>
   );

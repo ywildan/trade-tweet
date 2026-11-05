@@ -40,7 +40,7 @@ export default async function NotificationsPage({ searchParams }: PageProps) {
 
   return (
     <>
-      <header className="sticky top-0 z-20 border-b border-border bg-bg/65 backdrop-blur">
+      <header className="sticky top-0 z-20 border-b border-border bg-bg">
         <div className="flex h-[53px] items-center justify-between gap-3 px-4">
           <div>
             <h1 className="text-[20px] font-bold leading-6">Notifikasi</h1>
@@ -56,7 +56,7 @@ export default async function NotificationsPage({ searchParams }: PageProps) {
 
       <nav
         aria-label="Filter notifikasi"
-        className="sticky top-[53px] z-10 flex border-b border-border bg-bg/85 backdrop-blur"
+        className="sticky top-[53px] z-10 flex border-b border-border bg-bg"
       >
         {[
           { id: "all", label: "Semua", href: "/notifications" },
@@ -98,7 +98,7 @@ export default async function NotificationsPage({ searchParams }: PageProps) {
             <div className="py-4 text-center">
               <Link
                 href={`/notifications${unreadOnly ? "?filter=unread&" : "?"}cursor=${encodeURIComponent(nextCursor)}`}
-                className="rounded-2xl border border-border px-4 py-2 text-[14px] font-semibold hover:bg-text/[0.03]"
+                className="inline-flex min-h-11 items-center justify-center rounded-lg border border-border px-4 py-2 text-[14px] font-semibold hover:bg-text/[0.03]"
               >
                 Muat lebih banyak
               </Link>
@@ -112,7 +112,7 @@ export default async function NotificationsPage({ searchParams }: PageProps) {
           cta={
             <Link
               href="/"
-              className="rounded-2xl bg-accent px-4 py-2 text-[15px] font-semibold text-white"
+              className="inline-flex min-h-11 items-center justify-center rounded-lg bg-text px-4 py-2 text-[15px] font-semibold text-bg transition-colors hover:bg-text/90"
             >
               Jelajahi feed
             </Link>

@@ -7,7 +7,7 @@ import {
   type MarketName,
 } from "@/lib/symbols";
 
-/** GET /api/symbols?q=&market= — autocomplete simbol (spesifikasi.md §5). */
+/** GET /api/symbols?q=&market=: autocomplete simbol (spesifikasi.md §5). */
 export async function GET(request: Request) {
   await connection();
 

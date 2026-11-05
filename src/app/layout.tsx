@@ -4,18 +4,15 @@ import { ToastProvider } from "@/components/ui/toast";
 
 export const metadata: Metadata = {
   title: {
-    default: "Neuraly — Media sosial sinyal trading",
-    template: "%s — Neuraly",
+    default: "Neuraly · Media sosial sinyal trading",
+    template: "%s · Neuraly",
   },
   description:
     "Post sinyal trading seperti tweet. Kualitasmu terbukti lewat badge, win-rate, dan kartu share otomatis saat profit.",
 };
 
-/**
- * Anti-flash theme (DESIGN.md §10):
- * Tema disimpan di localStorage `theme`; bila belum pernah di-set,
- * ikuti prefers-color-scheme. Dijalankan SEBELUM paint.
- */
+/* Anti-flash tema: tersimpan di localStorage `theme`, bila belum pernah
+   di-set ikuti prefers-color-scheme. Dijalankan SEBELUM paint. */
 const themeScript = `(() => {
   try {
     const stored = localStorage.getItem("theme");

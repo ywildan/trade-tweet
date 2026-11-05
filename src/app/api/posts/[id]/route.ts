@@ -5,7 +5,7 @@ import { getPostDetail } from "@/lib/posts";
 
 type Context = { params: Promise<{ id: string }> };
 
-/** GET /api/posts/[id] — post + balasan (spesifikasi.md §5). */
+/** GET /api/posts/[id]: post + balasan (spesifikasi.md §5). */
 export async function GET(_request: Request, context: Context) {
   try {
     const { id } = await context.params;
@@ -20,7 +20,7 @@ export async function GET(_request: Request, context: Context) {
   }
 }
 
-/** DELETE /api/posts/[id] — soft delete, khusus pemilik (spesifikasi.md §5). */
+/** DELETE /api/posts/[id]: soft delete, khusus pemilik (spesifikasi.md §5). */
 export async function DELETE(_request: Request, context: Context) {
   try {
     const { id } = await context.params;

@@ -30,7 +30,7 @@ export async function generateMetadata({
   const symbol = normalizeSymbol(raw);
   const entry = findSymbolEntry(symbol);
   return {
-    title: `$${symbol}${entry ? ` — ${entry.name}` : ""}`,
+    title: `$${symbol}${entry ? ` · ${entry.name}` : ""}`,
     description: `Sinyal dan analisa ${symbol} di Neuraly.`,
   };
 }
@@ -59,7 +59,7 @@ export default async function SymbolPage({ params }: PageProps) {
 
   return (
     <>
-      <header className="sticky top-0 z-20 flex h-[53px] items-center gap-3 border-b border-border bg-bg/65 px-3 backdrop-blur">
+      <header className="sticky top-0 z-20 flex h-[53px] items-center gap-3 border-b border-border bg-bg px-3">
         <BackButton />
         <div className="min-w-0">
           <h1 className="truncate text-[20px] font-bold leading-6">
@@ -89,7 +89,7 @@ export default async function SymbolPage({ params }: PageProps) {
             cta={
               <Link
                 href="/compose"
-                className="rounded-2xl bg-accent px-4 py-2 text-[15px] font-semibold text-white"
+                className="inline-flex min-h-11 items-center justify-center rounded-lg bg-text px-4 py-2 text-[15px] font-semibold text-bg transition-colors hover:bg-text/90"
               >
                 Tulis sinyal
               </Link>

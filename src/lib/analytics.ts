@@ -9,7 +9,7 @@ export type PostAnalytics = {
   replies: number;
 };
 
-/** Angka analitik satu post — dipakai API owner-only dan panel detail post. */
+/** Angka analitik satu post: dipakai API owner-only dan panel detail post. */
 export async function getPostAnalytics(
   postId: string,
 ): Promise<PostAnalytics | null> {

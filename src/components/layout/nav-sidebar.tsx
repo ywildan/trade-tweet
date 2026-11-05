@@ -17,8 +17,8 @@ export async function NavSidebar() {
       <div>
         <Link
           href="/"
-          aria-label="Neuraly — beranda"
-          className="flex w-fit items-center gap-2 rounded-full p-3 transition-colors hover:bg-text/10"
+          aria-label="Neuraly, beranda"
+          className="flex w-fit items-center gap-2 rounded-lg p-3 transition-colors hover:bg-text/10"
         >
           <LogoMark size={32} />
           <span className="hidden text-[22px] font-bold tracking-tight lg:inline">
@@ -26,7 +26,10 @@ export async function NavSidebar() {
           </span>
         </Link>
 
-        <nav className="mt-2 space-y-1" aria-label="Navigasi utama">
+        <h2 className="mt-4 px-3 text-[13px] font-semibold text-text-muted">
+          Menu
+        </h2>
+        <nav className="mt-1 space-y-1" aria-label="Navigasi utama">
           <NavLink href="/" icon="home" label="Utama" exact />
           <NavLink href="/search" icon="search" label="Cari" />
           <NavLink
@@ -48,14 +51,11 @@ export async function NavSidebar() {
           />
         </nav>
 
-        {/* Seksi trading — dipisah visual dari nav utama agar sidebar
-            desktop terasa seperti panel trading, bukan daftar ikon X. */}
-        <p
-          aria-hidden
-          className="mt-5 px-3 text-[12px] font-semibold uppercase tracking-wider text-text-muted"
-        >
+        {/* Trading dipisah dari nav utama supaya sidebar terbaca sebagai
+            panel trading, bukan daftar ikon. */}
+        <h2 className="mt-5 px-3 text-[13px] font-semibold text-text-muted">
           Trading
-        </p>
+        </h2>
         <nav className="mt-1 space-y-1" aria-label="Navigasi trading">
           <NavLink
             href={user ? "/dashboard" : "/login?next=%2Fdashboard"}
@@ -82,11 +82,10 @@ export async function NavSidebar() {
 
         <Link
           href={user ? "/compose" : "/login?next=%2Fcompose"}
-          title="Buat postingan"
-          className="mt-4 flex h-12 w-12 items-center justify-center rounded-full bg-accent font-semibold text-white transition-colors hover:bg-accent-hover lg:w-full"
+          className="mt-4 flex h-12 w-full items-center justify-center gap-2 rounded-lg bg-accent font-semibold text-on-accent transition-colors hover:bg-accent-hover"
         >
-          <PenLine size={22} className="lg:hidden" />
-          <span className="hidden lg:inline">Posting</span>
+          <PenLine size={20} aria-hidden />
+          Posting
         </Link>
       </div>
 

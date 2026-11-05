@@ -1,4 +1,4 @@
-/** Sparkline ringan berbasis SVG — tanpa library chart (DESIGN.md §5.5). */
+/** Sparkline ringan berbasis SVG, tanpa library chart. */
 export function Sparkline({
   values,
   width = 96,

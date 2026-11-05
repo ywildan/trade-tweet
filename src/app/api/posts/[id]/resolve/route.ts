@@ -7,7 +7,7 @@ import { resolveSignalSchema } from "@/lib/validation";
 
 type Context = { params: Promise<{ id: string }> };
 
-/** POST /api/posts/[id]/resolve — finalisasi manual (khusus pembuat). */
+/** POST /api/posts/[id]/resolve: finalisasi manual (khusus pembuat). */
 export async function POST(request: Request, context: Context) {
   try {
     const session = await auth();

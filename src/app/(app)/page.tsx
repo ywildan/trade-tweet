@@ -22,7 +22,7 @@ export default function HomePage({
 }) {
   return (
     <>
-      <header className="sticky top-0 z-20 flex h-[53px] items-center justify-between border-b border-border bg-bg/65 px-4 backdrop-blur">
+      <header className="sticky top-0 z-20 flex h-[53px] items-center justify-between border-b border-border bg-bg px-4">
         <div className="flex items-center gap-2">
           <span className="lg:hidden">
             <LogoMark size={28} />
@@ -33,7 +33,7 @@ export default function HomePage({
           <Link
             href="/search"
             aria-label="Cari"
-            className="rounded-full p-2 transition-colors hover:bg-text/10"
+            className="flex min-h-11 min-w-11 items-center justify-center rounded-lg p-2 transition-colors hover:bg-text/10"
           >
             <Search size={20} />
           </Link>
@@ -100,7 +100,7 @@ function Tabs({ active }: { active: FeedTab }) {
   return (
     <nav
       aria-label="Tab feed"
-      className="sticky top-[53px] z-10 flex border-b border-border bg-bg/85 backdrop-blur"
+      className="sticky top-[53px] z-10 flex border-b border-border bg-bg"
     >
       {tabs.map((tab) => {
         const isActive = tab.id === active;
@@ -151,29 +151,32 @@ function GuestHero() {
 
 function HomeSkeleton() {
   return (
-    <div aria-hidden>
+    <div role="status">
+      <p className="sr-only">Memuat feed.</p>
+      <div aria-hidden>
       <div className="flex items-center gap-3 border-b border-border px-4 py-3">
-        <div className="h-10 w-10 animate-pulse rounded-full bg-bg-input" />
-        <div className="h-5 w-56 animate-pulse rounded bg-bg-input" />
+        <div className="h-10 w-10 rounded-full bg-bg-input" />
+        <div className="h-5 w-56 rounded bg-bg-input" />
       </div>
       <div className="flex border-b border-border">
         <div className="flex-1 border-b-2 border-accent py-3">
-          <div className="mx-auto h-4 w-24 animate-pulse rounded bg-bg-input" />
+          <div className="mx-auto h-4 w-24 rounded bg-bg-input" />
         </div>
         <div className="flex-1 py-3">
-          <div className="mx-auto h-4 w-20 animate-pulse rounded bg-bg-input" />
+          <div className="mx-auto h-4 w-20 rounded bg-bg-input" />
         </div>
       </div>
       {[0, 1, 2].map((index) => (
         <div key={index} className="flex gap-3 border-b border-border p-4">
-          <div className="h-10 w-10 animate-pulse rounded-full bg-bg-input" />
+          <div className="h-10 w-10 rounded-full bg-bg-input" />
           <div className="flex-1 space-y-2">
-            <div className="h-4 w-40 animate-pulse rounded bg-bg-input" />
-            <div className="h-4 w-full animate-pulse rounded bg-bg-input" />
-            <div className="h-4 w-4/5 animate-pulse rounded bg-bg-input" />
+            <div className="h-4 w-40 rounded bg-bg-input" />
+            <div className="h-4 w-full rounded bg-bg-input" />
+            <div className="h-4 w-4/5 rounded bg-bg-input" />
           </div>
         </div>
       ))}
+      </div>
     </div>
   );
 }

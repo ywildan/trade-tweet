@@ -44,7 +44,7 @@ export async function enforceRateLimit({
  * (mis. Vercel) menambahkan IP klien asli di ujung rantai, sedangkan
  * entri pertama sepenuhnya dikendalikan pengirim dan bisa dipalsukan
  * untuk memutar maupun menghabiskan kuota IP orang lain. Ini bukan
- * perlindungan sempurna di luar proxy tepercaya — karena itu limit login
+ * perlindungan sempurna di luar proxy tepercaya: karena itu limit login
  * juga diikat ke email (lihat route login).
  */
 export function requestKey(request: Request): string {

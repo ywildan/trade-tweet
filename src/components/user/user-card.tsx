@@ -5,7 +5,7 @@ import { Avatar } from "@/components/ui/avatar";
 import { UserBadges } from "@/components/ui/badge";
 import { FollowButton } from "@/components/user/follow-button";
 
-/** UserCard — baris trader di right rail / hasil pencarian (DESIGN.md §4). */
+/** UserCard, baris trader di right rail dan hasil pencarian. */
 export function UserCard({
   user,
   isFollowing,

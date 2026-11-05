@@ -46,7 +46,7 @@ type OpenSignal = {
 /**
  * Deteksi touch secara kronologis, candle demi candle.
  * Prioritas SL hanya berlaku bila TP dan SL tersentuh di candle YANG SAMA
- * (§8.2) — bukan bila keduanya pernah tersentuh kapan pun sejak entry.
+ * (§8.2): bukan bila keduanya pernah tersentuh kapan pun sejak entry.
  * Sinyal yang TP dulu lalu retrace ke SL di candle berikutnya tetap TP.
  */
 function detectTouch(
@@ -332,7 +332,7 @@ export async function runSignalCheck(
       try {
         // Rentang dihitung per sinyal: jangan memakai high/low sebelum entry.
         // Bila belum ada candle yang dimulai setelah entry, touch tidak bisa
-        // dibuktikan — jangan memakai candle pra-entry sebagai bukti.
+        // dibuktikan: jangan memakai candle pra-entry sebagai bukti.
         const entryTime = signal.createdAt.getTime();
         const relevant = candles.filter((candle) => candle.t >= entryTime);
         if (relevant.length === 0) {

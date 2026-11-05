@@ -1,12 +1,13 @@
+/* Warna avatar solid: varian gelap tiap token supaya inisial putih lolos
+   4,5:1 (aksen #0b6ea8, hijau #00875a, pink #c2185b, emas #8a6d00,
+   merah #d92d20, abu #536471). */
 const PALETTES = [
-  "bg-accent/80",
-  "bg-repost/80",
-  "bg-like/70",
-  "bg-gold/80",
-  "bg-short/60",
-  "bg-verified/70",
-  "bg-text-muted/60",
-  "bg-long/60",
+  "bg-[#0b6ea8]",
+  "bg-[#00875a]",
+  "bg-[#c2185b]",
+  "bg-[#8a6d00]",
+  "bg-[#d92d20]",
+  "bg-[#536471]",
 ];
 
 function initials(name: string) {
@@ -19,7 +20,7 @@ function initials(name: string) {
     .toUpperCase();
 }
 
-/** Avatar dengan fallback inisial + warna deterministik (DESIGN.md §10). */
+/* Avatar dengan fallback inisial + warna deterministik dari nama. */
 export function Avatar({
   name,
   src,

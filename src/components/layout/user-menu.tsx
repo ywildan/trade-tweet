@@ -53,7 +53,7 @@ export function UserMenu({
         onClick={() => setOpen((value) => !value)}
         aria-haspopup="menu"
         aria-expanded={open}
-        className="flex w-full items-center gap-3 rounded-full p-2 text-left transition-colors hover:bg-text/10"
+        className="flex w-full items-center gap-3 rounded-lg p-2 text-left transition-colors hover:bg-text/10"
       >
         <Avatar name={user.name} src={user.avatarUrl} size={40} />
         <span className="hidden min-w-0 flex-1 lg:block">
@@ -64,39 +64,41 @@ export function UserMenu({
             @{user.username}
           </span>
         </span>
-        <span className="hidden text-text-muted lg:inline">⋯</span>
+        <span className="hidden text-text-muted lg:inline" aria-hidden>
+          ⋯
+        </span>
       </button>
 
       {open && (
         <div
           role="menu"
-          className="absolute bottom-full left-0 z-[60] mb-2 w-[250px] overflow-hidden rounded-2xl border border-border bg-bg-elev py-1 shadow-2xl"
+          className="absolute bottom-full left-0 z-[60] mb-2 w-[250px] overflow-hidden rounded-xl border border-border bg-bg-elev py-1 shadow-2xl"
         >
           <Link
             href={`/@${user.username}`}
             role="menuitem"
             onClick={() => setOpen(false)}
-            className="flex items-center gap-3 px-4 py-3 text-[15px] transition-colors hover:bg-text/10"
+            className="flex min-h-[44px] items-center gap-3 px-4 py-3 text-[15px] transition-colors hover:bg-text/10"
           >
-            <UserRound size={18} />
+            <UserRound size={18} aria-hidden />
             Lihat profil
           </Link>
           <Link
             href="/dashboard"
             role="menuitem"
             onClick={() => setOpen(false)}
-            className="flex items-center gap-3 px-4 py-3 text-[15px] transition-colors hover:bg-text/10"
+            className="flex min-h-[44px] items-center gap-3 px-4 py-3 text-[15px] transition-colors hover:bg-text/10"
           >
-            <ChartNoAxesColumn size={18} />
+            <ChartNoAxesColumn size={18} aria-hidden />
             Analitik
           </Link>
           <Link
             href="/settings/profile"
             role="menuitem"
             onClick={() => setOpen(false)}
-            className="flex items-center gap-3 px-4 py-3 text-[15px] transition-colors hover:bg-text/10"
+            className="flex min-h-[44px] items-center gap-3 px-4 py-3 text-[15px] transition-colors hover:bg-text/10"
           >
-            <Settings size={18} />
+            <Settings size={18} aria-hidden />
             Kelola profil
           </Link>
           {user.role === "admin" && (
@@ -104,9 +106,9 @@ export function UserMenu({
               href="/admin/badges"
               role="menuitem"
               onClick={() => setOpen(false)}
-              className="flex items-center gap-3 px-4 py-3 text-[15px] transition-colors hover:bg-text/10"
+              className="flex min-h-[44px] items-center gap-3 px-4 py-3 text-[15px] transition-colors hover:bg-text/10"
             >
-              <ShieldCheck size={18} />
+              <ShieldCheck size={18} aria-hidden />
               Admin badge
             </Link>
           )}
@@ -115,9 +117,9 @@ export function UserMenu({
             role="menuitem"
             onClick={logout}
             disabled={busy}
-            className="flex w-full items-center gap-3 px-4 py-3 text-left text-[15px] transition-colors hover:bg-text/10 disabled:opacity-50"
+            className="flex min-h-[44px] w-full items-center gap-3 px-4 py-3 text-left text-[15px] transition-colors hover:bg-text/10 disabled:opacity-50"
           >
-            <LogOut size={18} />
+            <LogOut size={18} aria-hidden />
             {busy ? "Keluar…" : "Keluar"}
           </button>
         </div>

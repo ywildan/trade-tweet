@@ -25,7 +25,7 @@ const MESSAGES: Record<string, string> = {
   mention: "menyebut kamu",
 };
 
-/** Item notifikasi (spesifikasi.md §4 Phase 3, DESIGN.md §3). */
+/** Item notifikasi. */
 export function NotificationItem({
   notification,
 }: {
@@ -116,7 +116,6 @@ function notificationMessage(notification: NotificationItemData): string {
     if (post?.isSignal && post.symbol) {
       const pnl = post.pnlPercent != null ? ` ${formatPnl(post.pnlPercent)}` : "";
       if (post.status === "TP_HIT") {
-        // Tanpa emoji: ikon Target lucide sudah tampil di sisi kiri item.
         return `Sinyal ${post.symbol} kamu TP tercapai${pnl}`;
       }
       if (post.status === "SL_HIT") {

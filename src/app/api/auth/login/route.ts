@@ -18,7 +18,7 @@ export async function POST(request: Request) {
     }
 
     // Dua kunci sekaligus: IP saja bisa diputar lewat header, email saja
-    // bisa diputar lewat akun lain — keduanya bersama menutup keduanya.
+    // bisa diputar lewat akun lain: keduanya bersama menutup keduanya.
     const ip = requestKey(request);
     for (const key of [`login:ip:${ip}`, `login:email:${parsed.data.email}`]) {
       const limit = await enforceRateLimit({

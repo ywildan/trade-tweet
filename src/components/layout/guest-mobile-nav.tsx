@@ -7,11 +7,9 @@ import { Bell, Bookmark, ChartNoAxesColumn, X } from "lucide-react";
 import { MobileNavLink } from "@/components/layout/nav-link";
 import { Button } from "@/components/ui/button";
 
-/**
- * Bottom nav tamu (mobile): tanpa item Masuk/Daftar. Fitur yang butuh
- * login (Notifikasi, Simpanan, Analitik) membuka popup masuk/daftar
- * dengan tujuan yang dipertahankan lewat ?next=, bukan lewat item nav.
- */
+// Bottom nav tamu (mobile): tanpa item Masuk/Daftar. Fitur yang butuh
+// login membuka popup masuk/daftar dengan tujuan yang dipertahankan
+// lewat ?next=, bukan lewat item nav.
 export function GuestMobileNav() {
   const [prompt, setPrompt] = useState<{
     label: string;
@@ -42,7 +40,7 @@ export function GuestMobileNav() {
     <>
       <nav
         aria-label="Navigasi utama"
-        className="fixed inset-x-0 bottom-0 z-40 flex border-t border-border bg-bg/95 pb-[env(safe-area-inset-bottom)] backdrop-blur lg:hidden"
+        className="fixed inset-x-0 bottom-0 z-40 flex border-t border-border bg-bg pb-[env(safe-area-inset-bottom)] lg:hidden"
       >
         <MobileNavLink href="/" icon="home" label="Utama" exact />
         {protectedItems.map((item) => (
@@ -51,9 +49,9 @@ export function GuestMobileNav() {
             type="button"
             onClick={() => setPrompt({ label: item.label, next: item.next })}
             aria-label={`${item.label} (perlu masuk)`}
-            className="flex flex-1 flex-col items-center gap-0.5 py-2 text-[11px] text-text-muted"
+            className="flex min-h-[56px] flex-1 flex-col items-center justify-center gap-0.5 px-1 py-2 text-[11px] text-text-muted transition-colors hover:bg-text/10 hover:text-text active:bg-text/10"
           >
-            <item.icon size={24} strokeWidth={1.8} />
+            <item.icon size={24} strokeWidth={1.8} aria-hidden />
             {item.label}
           </button>
         ))}
@@ -71,7 +69,7 @@ export function GuestMobileNav() {
             role="dialog"
             aria-modal="true"
             aria-label="Masuk atau daftar"
-            className="w-full max-w-[400px] rounded-2xl border border-border bg-bg p-5 shadow-2xl"
+            className="w-full max-w-[400px] rounded-xl border border-border bg-bg p-5 shadow-2xl"
           >
             <div className="flex items-start justify-between gap-3">
               <h2 className="text-[19px] font-bold leading-6">
@@ -81,9 +79,9 @@ export function GuestMobileNav() {
                 type="button"
                 onClick={() => setPrompt(null)}
                 aria-label="Tutup"
-                className="rounded-full p-1.5 text-text-muted transition-colors hover:bg-text/10 hover:text-text"
+                className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg text-text-muted transition-colors hover:bg-text/10 hover:text-text"
               >
-                <X size={20} />
+                <X size={20} aria-hidden />
               </button>
             </div>
             <p className="mt-2 text-[15px] leading-5 text-text-muted">

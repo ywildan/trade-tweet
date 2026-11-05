@@ -3,7 +3,7 @@ import { apiOk, handleApiError } from "@/lib/api";
 import { searchAll } from "@/lib/search";
 import { getSessionUser } from "@/lib/session";
 
-/** GET /api/search?q= — user (username/nama), post (isi), simbol katalog. */
+/** GET /api/search?q=: user (username/nama), post (isi), simbol katalog. */
 export async function GET(request: Request) {
   await connection();
 

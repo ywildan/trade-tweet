@@ -186,8 +186,7 @@ export function ComposeBox({
     }
   }
 
-  // Tombol Posting harus nonaktif saat sinyal belum lengkap, bukan baru
-  // gagal setelah diklik: field kosong atau liveErrors apa pun memblokir.
+  // Tombol Posting nonaktif sampai sinyal lengkap, bukan baru gagal setelah diklik.
   const signalComplete =
     !isSignalActive ||
     (symbol.trim().length > 0 &&
@@ -330,7 +329,7 @@ export function ComposeBox({
                   : "Tulis postingan"
             }
             aria-invalid={Boolean(errors.content)}
-            className="min-h-[44px] w-full resize-none bg-transparent py-2 text-[19px] leading-6 text-text outline-none placeholder:text-text-muted"
+            className="min-h-[44px] w-full resize-none bg-transparent py-2 text-[19px] leading-6 text-text placeholder:text-text-muted"
           />
 
           {(errors.content || liveErrors.content) && (
@@ -407,9 +406,9 @@ export function ComposeBox({
                   setGeneralError(null);
                 }}
                 aria-pressed={isSignal}
-                className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-[13px] font-semibold transition-colors ${
+                className={`inline-flex min-h-11 items-center gap-1.5 rounded-lg border px-3 py-1.5 text-[13px] font-semibold transition-colors ${
                   isSignal
-                    ? "border-accent bg-accent text-white"
+                    ? "border-accent bg-accent/15 text-accent"
                     : "border-border text-text-muted hover:bg-bg-input/60 hover:text-text"
                 }`}
               >
@@ -440,7 +439,7 @@ export function ComposeBox({
 
 function QuotePreview({ quote }: { quote: QuotePost }) {
   return (
-    <div className="mt-2 rounded-2xl border border-border p-3">
+    <div className="mt-2 rounded-xl border border-border p-3">
       <div className="flex items-center gap-1.5 text-[13px]">
         <Avatar name={quote.author.name} src={quote.author.avatarUrl} size={20} />
         <span className="font-semibold">{quote.author.name}</span>
@@ -551,7 +550,7 @@ function SignalFields({
   const fieldError = (name: string) => errors[name] ?? liveErrors[name];
 
   return (
-    <div className="mt-2 space-y-3 rounded-2xl border border-border bg-bg-elev/40 p-3">
+    <div className="mt-2 space-y-3 rounded-xl border border-border bg-bg-elev/40 p-3">
       <div className="grid gap-3 sm:grid-cols-2">
         <Field
           label="Simbol"
@@ -592,7 +591,7 @@ function SignalFields({
                       onSymbolChange(item.symbol);
                       onSymbolBlur();
                     }}
-                    className="flex w-full items-center gap-2 px-3 py-2 text-left text-[14px] hover:bg-text/5"
+                    className="flex min-h-11 w-full items-center gap-2 px-3 py-2 text-left text-[14px] hover:bg-text/5"
                   >
                     <span className="font-semibold">{item.symbol}</span>
                     <span className="truncate text-[12px] text-text-muted">
@@ -624,7 +623,7 @@ function SignalFields({
                   title={enabled ? MARKET_LABEL[item] : "Segera hadir"}
                   aria-pressed={active}
                   onClick={() => onMarketChange(item)}
-                  className={`flex-1 rounded-lg border px-2 py-2 text-[13px] font-semibold transition-colors ${
+                  className={`flex min-h-11 flex-1 rounded-lg border px-2 py-2 text-[13px] font-semibold transition-colors ${
                     active
                       ? "border-accent bg-accent/15 text-accent"
                       : enabled
@@ -658,18 +657,26 @@ function SignalFields({
                   type="button"
                   aria-pressed={active}
                   onClick={() => onDirectionChange(item)}
-                  className={`flex flex-1 items-center justify-center gap-1 rounded-lg border px-2 py-2 text-[13px] font-semibold transition-colors ${
+                  className={`flex min-h-11 flex-1 items-center justify-center gap-1 rounded-lg border px-2 py-2 text-[13px] font-semibold transition-colors ${
                     active
                       ? long
-                        ? "border-long bg-long/15 text-long"
-                        : "border-short bg-short/15 text-short"
+                        ? "border-long bg-long/15 text-text"
+                        : "border-short bg-short/15 text-text"
                       : "border-border text-text-muted hover:bg-bg-input/60 hover:text-text"
                   }`}
                 >
                   {long ? (
-                    <TrendingUp size={15} aria-hidden />
+                    <TrendingUp
+                      size={15}
+                      aria-hidden
+                      className={active ? "text-long" : undefined}
+                    />
                   ) : (
-                    <TrendingDown size={15} aria-hidden />
+                    <TrendingDown
+                      size={15}
+                      aria-hidden
+                      className={active ? "text-short" : undefined}
+                    />
                   )}
                   {long ? "LONG" : "SHORT"}
                 </button>

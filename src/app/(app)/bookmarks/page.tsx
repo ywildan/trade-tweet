@@ -21,7 +21,7 @@ export default async function BookmarksPage() {
 
   return (
     <>
-      <header className="sticky top-0 z-20 flex h-[53px] items-center gap-4 border-b border-border bg-bg/65 px-4 backdrop-blur">
+      <header className="sticky top-0 z-20 flex h-[53px] items-center gap-4 border-b border-border bg-bg px-4">
         <h1 className="text-[20px] font-bold">Simpanan</h1>
         <span className="text-[13px] text-text-muted">
           {posts.length} postingan
@@ -37,7 +37,7 @@ export default async function BookmarksPage() {
           cta={
             <Link
               href="/"
-              className="rounded-2xl bg-accent px-4 py-2 text-[15px] font-semibold text-white"
+              className="inline-flex min-h-11 items-center justify-center rounded-lg bg-text px-4 py-2 text-[15px] font-semibold text-bg transition-colors hover:bg-text/90"
             >
               Jelajahi feed
             </Link>
