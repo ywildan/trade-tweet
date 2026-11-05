@@ -35,7 +35,7 @@ const COLORS: Array<[name: string, cssVar: string]> = [
   ["border", "--border"],
   ["text", "--text"],
   ["text-muted", "--text-muted"],
-  ["accent ✦ aksi tautan/follow", "--accent"],
+  ["accent (aksi tautan/follow)", "--accent"],
   ["like", "--like"],
   ["repost", "--repost"],
   ["save", "--save"],
@@ -213,7 +213,7 @@ function PostCardVariant() {
             <span className="text-text-muted">·</span>
             <time className="text-text-muted">1 d</time>
           </div>
-          <p className="mt-1">Result di sini — TP tercapai 2 hari sejak entry 👋</p>
+          <p className="mt-1">Result di sini — TP tercapai 2 hari sejak entry</p>
           <SignalCard
             symbol="BTCUSDT"
             direction="LONG"

@@ -2,7 +2,12 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Loader2, Target } from "lucide-react";
+import {
+  Loader2,
+  Target,
+  TrendingDown,
+  TrendingUp,
+} from "lucide-react";
 
 import { Avatar } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -653,7 +658,7 @@ function SignalFields({
                   type="button"
                   aria-pressed={active}
                   onClick={() => onDirectionChange(item)}
-                  className={`flex-1 rounded-lg border px-2 py-2 text-[13px] font-semibold transition-colors ${
+                  className={`flex flex-1 items-center justify-center gap-1 rounded-lg border px-2 py-2 text-[13px] font-semibold transition-colors ${
                     active
                       ? long
                         ? "border-long bg-long/15 text-long"
@@ -661,7 +666,12 @@ function SignalFields({
                       : "border-border text-text-muted hover:bg-bg-input/60 hover:text-text"
                   }`}
                 >
-                  {long ? "▲ LONG" : "▼ SHORT"}
+                  {long ? (
+                    <TrendingUp size={15} aria-hidden />
+                  ) : (
+                    <TrendingDown size={15} aria-hidden />
+                  )}
+                  {long ? "LONG" : "SHORT"}
                 </button>
               );
             })}

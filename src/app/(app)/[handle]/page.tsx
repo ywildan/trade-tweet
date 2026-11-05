@@ -190,7 +190,13 @@ async function ProfileView({
       </div>
 
       <div className="px-4 pb-4">
-        <div className="-mt-[60px] flex items-end justify-between gap-3">
+        {/*
+          Avatar harus di atas banner: banner di atas adalah elemen
+          `relative`, sehingga tanpa posisi + z-index di sini, separuh
+          avatar yang menumpuk banner (-mt-60px) akan tertutup banner
+          dan terlihat seperti logo terpotong.
+        */}
+        <div className="relative z-10 -mt-[60px] flex items-end justify-between gap-3">
           <Avatar
             name={user.name}
             src={user.avatarUrl}

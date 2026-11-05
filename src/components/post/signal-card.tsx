@@ -1,4 +1,11 @@
+import type { ReactNode } from "react";
 import Link from "next/link";
+import {
+  ArrowDown,
+  ArrowUp,
+  TrendingDown,
+  TrendingUp,
+} from "lucide-react";
 
 import { formatPrice, formatPnl } from "@/lib/format";
 import { SignalStatusChip } from "@/components/ui/badge";
@@ -56,11 +63,16 @@ export function SignalCard({
           {symbol}
         </Link>
         <span
-          className={`inline-flex items-center rounded-full px-2.5 py-[2px] text-xs font-semibold ${
+          className={`inline-flex items-center gap-1 rounded-full px-2.5 py-[2px] text-xs font-semibold ${
             isLong ? "bg-long/15 text-long" : "bg-short/15 text-short"
           }`}
         >
-          {isLong ? "▲ LONG" : "▼ SHORT"}
+          {isLong ? (
+            <TrendingUp size={14} aria-hidden />
+          ) : (
+            <TrendingDown size={14} aria-hidden />
+          )}
+          {isLong ? "LONG" : "SHORT"}
         </span>
         <span className="text-[13px] text-text-muted">
           · {timeframe.toUpperCase()}
@@ -74,17 +86,29 @@ export function SignalCard({
       <div className="mt-3 grid grid-cols-2 gap-x-2 gap-y-1.5 tabular">
         <Cell label="Entry" value={formatPrice(entry)} />
         {/* Panah mengikuti arah harga, bukan label: untuk SHORT, TP ada di
-            bawah entry (▼) dan SL di atas entry (▲) — sebelumnya terbalik. */}
+            bawah entry dan SL di atas entry — sebelumnya terbalik. */}
         <Cell
           label="TP"
           value={formatPrice(takeProfit)}
-          arrow={isLong ? "▲" : "▼"}
+          arrow={
+            isLong ? (
+              <ArrowUp size={12} aria-hidden />
+            ) : (
+              <ArrowDown size={12} aria-hidden />
+            )
+          }
           color="text-long"
         />
         <Cell
           label="Stop Loss"
           value={formatPrice(stopLoss)}
-          arrow={isLong ? "▼" : "▲"}
+          arrow={
+            isLong ? (
+              <ArrowDown size={12} aria-hidden />
+            ) : (
+              <ArrowUp size={12} aria-hidden />
+            )
+          }
           color="text-short"
         />
         <div className="flex items-center gap-2">
@@ -106,7 +130,7 @@ function Cell({
 }: {
   label: string;
   value: string;
-  arrow?: string;
+  arrow?: ReactNode;
   color?: string;
 }) {
   return (
@@ -115,7 +139,9 @@ function Cell({
       <span className="ml-auto text-[15px] font-semibold text-text">
         {value}
         {arrow && (
-          <span className={`ml-1 text-[12px] ${color ?? "text-text-muted"}`}>
+          <span
+            className={`ml-1 inline-flex align-middle ${color ?? "text-text-muted"}`}
+          >
             {arrow}
           </span>
         )}

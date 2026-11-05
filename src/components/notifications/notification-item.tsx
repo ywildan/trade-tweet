@@ -116,7 +116,8 @@ function notificationMessage(notification: NotificationItemData): string {
     if (post?.isSignal && post.symbol) {
       const pnl = post.pnlPercent != null ? ` ${formatPnl(post.pnlPercent)}` : "";
       if (post.status === "TP_HIT") {
-        return `Sinyal ${post.symbol} kamu TP tercapai 🎯${pnl}`;
+        // Tanpa emoji: ikon Target lucide sudah tampil di sisi kiri item.
+        return `Sinyal ${post.symbol} kamu TP tercapai${pnl}`;
       }
       if (post.status === "SL_HIT") {
         return `Sinyal ${post.symbol} kamu kena SL${pnl}`;

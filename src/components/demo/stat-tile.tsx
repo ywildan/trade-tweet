@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { TrendingDown, TrendingUp } from "lucide-react";
 
 /** StatTile — kartu statistik dashboard (DESIGN.md §5.5). Server-safe. */
 export function StatTile({
@@ -26,11 +27,16 @@ export function StatTile({
           </div>
           {delta != null && (
             <div
-              className={`mt-1 text-[13px] font-semibold ${
+              className={`mt-1 flex items-center gap-1 text-[13px] font-semibold ${
                 delta >= 0 ? "text-long" : "text-short"
               }`}
             >
-              {delta >= 0 ? "▲" : "▼"} {Math.abs(delta).toLocaleString("id-ID")}%{" "}
+              {delta >= 0 ? (
+                <TrendingUp size={14} aria-hidden />
+              ) : (
+                <TrendingDown size={14} aria-hidden />
+              )}{" "}
+              {Math.abs(delta).toLocaleString("id-ID")}%{" "}
               <span className="text-text-muted font-normal">30 hari</span>
             </div>
           )}

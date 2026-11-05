@@ -1,4 +1,12 @@
 import type { ReactNode } from "react";
+import {
+  Banknote,
+  Search,
+  Star,
+  Target,
+  TrendingUp,
+  type LucideIcon,
+} from "lucide-react";
 
 /**
  * Badge — DESIGN.md §7. Dipasangkan SETELAH nama user, semua ukuran 12–18px.
@@ -35,11 +43,20 @@ const pillStyles: Record<string, string> = {
 };
 
 const pillLabels: Record<string, string> = {
-  curator: "⭐ Kurator",
-  sniper: "🎯 Sniper",
-  consistent: "📈 Konsisten",
-  profit_hunter: "💰 Profit Hunter",
-  analyst: "🔍 Analis",
+  curator: "Kurator",
+  sniper: "Sniper",
+  consistent: "Konsisten",
+  profit_hunter: "Profit Hunter",
+  analyst: "Analis",
+};
+
+/** Ikon lucide per badge — menggantikan emoji yang dulu menempel di label. */
+const pillIcons: Record<string, LucideIcon> = {
+  curator: Star,
+  sniper: Target,
+  consistent: TrendingUp,
+  profit_hunter: Banknote,
+  analyst: Search,
 };
 
 /** Pill badge reputasi (sniper, dsb). type = UserBadge.type di DB. */
@@ -52,16 +69,20 @@ export function ReputationBadge({
 }) {
   const cls = pillStyles[type];
   const label = pillLabels[type];
-  if (!cls) return null;
+  const Icon = pillIcons[type];
+  if (!cls || !label || !Icon) return null;
   return (
     <span
-      className={`inline-flex items-center rounded-full font-semibold ${cls} ${
+      className={`inline-flex items-center gap-1 rounded-full font-semibold ${cls} ${
         size === "sm" ? "px-2 py-[1px] text-[11px]" : "px-2.5 py-[2px] text-xs"
       }`}
       title={label}
       aria-label={label}
     >
-      {size === "sm" ? label.split(" ")[0] : label}
+      <Icon size={size === "sm" ? 12 : 13} aria-hidden />
+      {/* Ukuran sm hanya menampilkan ikon (dengan aria-label lengkap),
+          bukan lagi sepotong kata seperti sebelumnya. */}
+      {size === "sm" ? null : label}
     </span>
   );
 }
@@ -104,15 +125,17 @@ export function SignalStatusChip({
   };
   const label: Record<string, string> = {
     OPEN: "OPEN",
-    TP_HIT: "TP 🎯",
+    TP_HIT: "TP",
     SL_HIT: "SL",
     EXPIRED: "Kedaluwarsa",
     CANCELLED: "Batal",
   };
+  const Icon = status === "TP_HIT" ? Target : null;
   return (
     <span
-      className={`inline-flex items-center rounded-full px-2.5 py-[2px] text-[11px] font-semibold tracking-wide ${map[status]}`}
+      className={`inline-flex items-center gap-1 rounded-full px-2.5 py-[2px] text-[11px] font-semibold tracking-wide ${map[status]}`}
     >
+      {Icon && <Icon size={12} aria-hidden />}
       {label[status]}
     </span>
   );

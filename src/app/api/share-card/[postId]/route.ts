@@ -120,7 +120,7 @@ async function getShareCard(request: Request, context: Context) {
   <text x="126" y="82" font-size="30" font-weight="700" fill="#e7e9ea">SPMTrade</text>
 
   <text x="1136" y="80" text-anchor="end" font-size="18" letter-spacing="2" fill="#71767b">${
-    verified ? "TRADER TERVERIFIKASI ✓" : "SINYAL SPMTRADE"
+    verified ? "TRADER TERVERIFIKASI" : "SINYAL SPMTRADE"
   }</text>
 
   <text x="64" y="196" font-size="64" font-weight="700" fill="#e7e9ea">${symbol} <tspan fill="${accent}">· ${direction}</tspan></text>
