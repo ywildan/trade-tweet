@@ -15,6 +15,15 @@ export async function POST(request: Request) {
       return apiError("UNAUTH", "Masuk dulu untuk memposting.", 401);
     }
 
+    const body = await request.json().catch(() => null);
+    const parsed = postSchema.safeParse(body);
+    if (!parsed.success) {
+      return apiError("INVALID", "Postingan tidak valid.", 400, {
+        fieldErrors: parsed.error.flatten().fieldErrors,
+      });
+    }
+
+    // Validasi dulu: body tidak valid tidak boleh menghabiskan kuota.
     const limit = await enforceRateLimit({
       key: `post:${session.user.id}`,
       limit: 10,
@@ -28,14 +37,6 @@ export async function POST(request: Request) {
       );
       response.headers.set("Retry-After", String(limit.retryAfter));
       return response;
-    }
-
-    const body = await request.json().catch(() => null);
-    const parsed = postSchema.safeParse(body);
-    if (!parsed.success) {
-      return apiError("INVALID", "Postingan tidak valid.", 400, {
-        fieldErrors: parsed.error.flatten().fieldErrors,
-      });
     }
 
     const data = parsed.data;

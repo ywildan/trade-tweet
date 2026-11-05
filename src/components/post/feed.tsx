@@ -71,7 +71,10 @@ export function Feed({
 
   useEffect(() => {
     const node = sentinelRef.current;
-    if (!node || !cursor) return;
+    // Saat error, observer dimatikan: retry hanya lewat tombol "Coba lagi".
+    // Tanpa penjaga ini, observer yang dibuat ulang setelah loading kembali
+    // false akan langsung memanggil loadMore lagi tanpa henti.
+    if (!node || !cursor || error) return;
     const observer = new IntersectionObserver(
       (entries) => {
         if (entries[0]?.isIntersecting) loadMore();
@@ -80,7 +83,7 @@ export function Feed({
     );
     observer.observe(node);
     return () => observer.disconnect();
-  }, [cursor, loadMore]);
+  }, [cursor, loadMore, error]);
 
   if (requiresAuth) {
     return (

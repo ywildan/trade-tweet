@@ -115,7 +115,7 @@ export function PostActions({
 
   async function toggleLike() {
     if (post.viewer === null) return goLogin();
-    if (busy) return;
+    if (busy === "like") return;
 
     const next = !liked;
     setLiked(next);
@@ -144,7 +144,7 @@ export function PostActions({
   async function toggleRepost() {
     setMenuOpen(false);
     if (post.viewer === null) return goLogin();
-    if (busy) return;
+    if (busy === "repost") return;
 
     const next = !reposted;
     setReposted(next);
@@ -177,7 +177,7 @@ export function PostActions({
 
   async function toggleBookmark() {
     if (post.viewer === null) return goLogin();
-    if (busy) return;
+    if (busy === "bookmark") return;
 
     const next = !bookmarked;
     setBookmarked(next);
@@ -261,7 +261,7 @@ export function PostActions({
               type="button"
               role="menuitem"
               onClick={toggleRepost}
-              disabled={busy !== null}
+              disabled={busy === "repost"}
               className="flex w-full items-center gap-3 px-4 py-2.5 text-left text-[14px] transition-colors hover:bg-text/10 disabled:opacity-60"
             >
               <Repeat2 size={17} />
@@ -328,17 +328,22 @@ export function PostActions({
       </button>
 
       {showShare &&
-        (post.status === "TP_HIT" && !post.disputed ? (
+        ((post.status === "TP_HIT" || post.status === "SL_HIT") &&
+        !post.disputed ? (
           <ShareResultButton postId={post.id} />
         ) : (
           <button
             type="button"
             disabled
-            aria-label="Bagikan"
+            aria-label={
+              post.disputed
+                ? "Bagikan tidak tersedia: hasil ini diperdebatkan."
+                : "Bagikan tidak tersedia: kartu hasil hanya untuk sinyal TP atau SL."
+            }
             title={
               post.disputed
                 ? "Hasil ini diperdebatkan, kartu tidak tersedia."
-                : "Kartu hasil tersedia untuk sinyal TP."
+                : "Kartu hasil tersedia untuk sinyal TP atau SL."
             }
             className="inline-flex cursor-not-allowed items-center gap-1 rounded-full p-1.5 text-[13px] opacity-60"
           >

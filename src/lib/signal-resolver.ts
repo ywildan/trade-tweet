@@ -43,10 +43,15 @@ type OpenSignal = {
   createdAt: Date;
 };
 
+/**
+ * Deteksi touch secara kronologis, candle demi candle.
+ * Prioritas SL hanya berlaku bila TP dan SL tersentuh di candle YANG SAMA
+ * (§8.2) — bukan bila keduanya pernah tersentuh kapan pun sejak entry.
+ * Sinyal yang TP dulu lalu retrace ke SL di candle berikutnya tetap TP.
+ */
 function detectTouch(
   signal: OpenSignal,
-  high: number,
-  low: number,
+  candles: Candle[],
 ): "TP_HIT" | "SL_HIT" | null {
   if (
     !signal.direction ||
@@ -58,13 +63,20 @@ function detectTouch(
   }
 
   const isLong = signal.direction === "LONG";
-  const tpHit = isLong ? high >= signal.takeProfit : low <= signal.takeProfit;
-  const slHit = isLong ? low <= signal.stopLoss : high >= signal.stopLoss;
+  const sorted = [...candles].sort((a, b) => a.t - b.t);
+  for (const candle of sorted) {
+    const tpHit = isLong
+      ? candle.high >= signal.takeProfit
+      : candle.low <= signal.takeProfit;
+    const slHit = isLong
+      ? candle.low <= signal.stopLoss
+      : candle.high >= signal.stopLoss;
 
-  // Konservatif: bila keduanya tersentuh dalam rentang, pilih SL (§8.2).
-  if (tpHit && slHit) return "SL_HIT";
-  if (tpHit) return "TP_HIT";
-  if (slHit) return "SL_HIT";
+    // Konservatif di dalam satu candle: bila keduanya tersentuh, pilih SL.
+    if (tpHit && slHit) return "SL_HIT";
+    if (tpHit) return "TP_HIT";
+    if (slHit) return "SL_HIT";
+  }
   return null;
 }
 
@@ -145,10 +157,14 @@ export async function resolveSignal({
       const slsHit = stat.slsHit + (outcome === "SL_HIT" ? 1 : 0);
       const expired = stat.expired + (outcome === "EXPIRED" ? 1 : 0);
       const denominator = tpsHit + slsHit;
+      // PnL null (mis. EXPIRED tanpa harga feed) tidak boleh ditarik ke 0:
+      // rata-rata tetap dari sinyal-sinyal yang PnL-nya diketahui.
       const avgPnl =
-        resolved > 0
-          ? (stat.avgPnl * resolved + (pnl ?? 0)) / (resolved + 1)
-          : (pnl ?? 0);
+        pnl == null
+          ? stat.avgPnl
+          : resolved > 0
+            ? (stat.avgPnl * resolved + pnl) / (resolved + 1)
+            : pnl;
 
       await tx.signalStat.update({
         where: { userId: signal.authorId },
@@ -233,19 +249,50 @@ export async function runSignalCheck(
     else groups.set(key, [signal]);
   }
 
-  const orderedGroups = [...groups.entries()]
-    .sort(
-      (a, b) =>
-        Math.min(...a[1].map((signal) => signal.createdAt.getTime())) -
-        Math.min(...b[1].map((signal) => signal.createdAt.getTime())),
-    )
-    .slice(0, MAX_SYMBOLS_PER_RUN);
+  const orderedGroups = [...groups.entries()].sort(
+    (a, b) =>
+      Math.min(...a[1].map((signal) => signal.createdAt.getTime())) -
+      Math.min(...b[1].map((signal) => signal.createdAt.getTime())),
+  );
+  // Cap 20 hanya membatasi pengecekan TP/SL via feed, bukan expiry:
+  // expiry murni berbasis waktu (§8.4) dan harus jalan untuk semua grup,
+  // termasuk grup yang feed-nya gagal atau terlewat cap.
+  const feedGroups = orderedGroups.slice(0, MAX_SYMBOLS_PER_RUN);
+  const skippedGroups = orderedGroups.slice(MAX_SYMBOLS_PER_RUN);
 
   let resolved = 0;
   let expired = 0;
   let failedSymbols = 0;
 
-  for (const [, group] of orderedGroups) {
+  async function expireIfDue(
+    signal: OpenSignal,
+    price: number | null,
+  ): Promise<boolean> {
+    const expiry = new Date(
+      signal.createdAt.getTime() +
+        timeframeMinutes(signal.timeframe) * 3 * 60_000,
+    );
+    if (now <= expiry) return false;
+    try {
+      const result = await resolveSignal({
+        postId: signal.id,
+        outcome: "EXPIRED",
+        price,
+        resolvedBy: "auto",
+        notify: true,
+      });
+      if (result) {
+        resolved += 1;
+        expired += 1;
+        return true;
+      }
+    } catch (error) {
+      console.error(`[signal-check] gagal expire ${signal.id}`, error);
+    }
+    return false;
+  }
+
+  for (const [, group] of feedGroups) {
     const first = group[0];
     if (!first.market || !first.symbol) continue;
 
@@ -266,6 +313,9 @@ export async function runSignalCheck(
         `[signal-check] gagal feed ${first.market}:${first.symbol}`,
         error,
       );
+      // Feed gagal bukan alasan menahan expiry: resolve EXPIRED tanpa harga
+      // (PnL null, rata-rata PnL tidak berubah) daripada OPEN selamanya.
+      for (const signal of group) await expireIfDue(signal, null);
       continue;
     }
 
@@ -274,29 +324,28 @@ export async function runSignalCheck(
       console.error(
         `[signal-check] feed kosong ${first.market}:${first.symbol}`,
       );
+      for (const signal of group) await expireIfDue(signal, null);
       continue;
     }
 
     for (const signal of group) {
       try {
         // Rentang dihitung per sinyal: jangan memakai high/low sebelum entry.
+        // Bila belum ada candle yang dimulai setelah entry, touch tidak bisa
+        // dibuktikan — jangan memakai candle pra-entry sebagai bukti.
         const entryTime = signal.createdAt.getTime();
         const relevant = candles.filter((candle) => candle.t >= entryTime);
-        const used = relevant.length > 0 ? relevant : [candles[candles.length - 1]];
-
-        let high = used[0].high;
-        let low = used[0].low;
-        for (const candle of used) {
-          high = Math.max(high, candle.high);
-          low = Math.min(low, candle.low);
+        if (relevant.length === 0) {
+          await expireIfDue(signal, null);
+          continue;
         }
-        const last = used[used.length - 1].close;
+        const last = relevant[relevant.length - 1].close;
 
         await prisma.signalCheck.create({
           data: { postId: signal.id, ts: now, price: last },
         });
 
-        const touched = detectTouch(signal, high, low);
+        const touched = detectTouch(signal, relevant);
         const expiry = new Date(
           signal.createdAt.getTime() +
             timeframeMinutes(signal.timeframe) * 3 * 60_000,
@@ -320,6 +369,11 @@ export async function runSignalCheck(
         console.error(`[signal-check] gagal resolve ${signal.id}`, error);
       }
     }
+  }
+
+  // Grup di luar cap tetap diperiksa expiry-nya (tanpa harga feed).
+  for (const [, group] of skippedGroups) {
+    for (const signal of group) await expireIfDue(signal, null);
   }
 
   const badges = await awardBadgesForAllUsers();

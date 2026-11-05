@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { BackButton } from "@/components/ui/back-button";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
@@ -8,7 +9,7 @@ import { SymbolPrice } from "@/components/symbol/symbol-price";
 import { getSymbolPosts } from "@/lib/posts";
 import { getPriceFeed } from "@/lib/price-feed";
 import { getSessionUser } from "@/lib/session";
-import { findSymbolEntry, inferMarket } from "@/lib/symbols";
+import { findSymbolEntry } from "@/lib/symbols";
 
 export const instant = false;
 
@@ -41,7 +42,9 @@ export default async function SymbolPage({ params }: PageProps) {
 
   const user = await getSessionUser();
   const entry = findSymbolEntry(symbol);
-  const market = entry?.market ?? inferMarket(symbol);
+  // Simbol di luar katalog bukan halaman kosong yang seolah valid.
+  if (!entry) notFound();
+  const market = entry.market;
 
   const [posts, initialQuote] = await Promise.all([
     getSymbolPosts(symbol, user?.id ?? null),
@@ -57,13 +60,7 @@ export default async function SymbolPage({ params }: PageProps) {
   return (
     <>
       <header className="sticky top-0 z-20 flex h-[53px] items-center gap-3 border-b border-border bg-bg/65 px-3 backdrop-blur">
-        <Link
-          href="/"
-          aria-label="Kembali ke beranda"
-          className="-ml-1 rounded-full p-2 text-[20px] transition-colors hover:bg-text/10"
-        >
-          ←
-        </Link>
+        <BackButton />
         <div className="min-w-0">
           <h1 className="truncate text-[20px] font-bold leading-6">
             ${symbol}

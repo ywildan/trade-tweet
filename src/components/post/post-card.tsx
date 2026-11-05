@@ -10,6 +10,7 @@ import { PostActions } from "@/components/post/post-actions";
 import { SignalCard } from "@/components/post/signal-card";
 import { hasSignalShape } from "@/lib/post-guards";
 import { formatRelativeTime } from "@/lib/format";
+import { findSymbolEntry } from "@/lib/symbols";
 import type { FeedPost } from "@/types/post";
 
 /**
@@ -32,19 +33,13 @@ export function PostCard({
     router.push(href);
   }
 
+  // Artikel bukan lagi role="link": role itu membungkus tautan/tombol di
+  // dalamnya (tidak valid) dan merusak klik-tengah/buka-tab-baru. Akses
+  // keyboard ke detail tetap ada lewat tautan waktu di bawah, klik mouse
+  // di area kosong tetap membuka detail lewat openPost.
   return (
     <article
-      role="link"
-      tabIndex={0}
-      aria-label={`Postingan ${post.author.name}`}
       onClick={openPost}
-      onKeyDown={(event) => {
-        if (event.target !== event.currentTarget) return;
-        if (event.key === "Enter" || event.key === " ") {
-          event.preventDefault();
-          router.push(href);
-        }
-      }}
       className="group relative cursor-pointer border-b border-border p-4 transition-colors duration-150 hover:bg-text/[0.03] focus-visible:bg-text/[0.03] focus-visible:outline-none"
     >
       <div className="flex gap-3">
@@ -79,14 +74,20 @@ export function PostCard({
               @{post.author.username}
             </Link>
             <span className="text-text-muted">·</span>
-            <time
-              dateTime={post.createdAt}
-              suppressHydrationWarning
-              className="shrink-0 text-text-muted"
-              title={new Date(post.createdAt).toLocaleString("id-ID")}
+            <Link
+              href={href}
+              onClick={(event) => event.stopPropagation()}
+              aria-label={`Buka postingan ${post.author.name}`}
+              className="shrink-0 text-text-muted hover:underline"
             >
-              {formatRelativeTime(post.createdAt)}
-            </time>
+              <time
+                dateTime={post.createdAt}
+                suppressHydrationWarning
+                title={new Date(post.createdAt).toLocaleString("id-ID")}
+              >
+                {formatRelativeTime(post.createdAt)}
+              </time>
+            </Link>
           </div>
 
           {post.content && (
@@ -144,7 +145,7 @@ export function QuoteCard({ quote }: { quote: NonNullable<FeedPost["quote"]> }) 
         </time>
       </span>
       {quote.content && (
-        <span className="mt-1 line-clamp-2 block text-[13px] text-text-muted">
+        <span className="mt-1 line-clamp-2 block text-[15px] text-text-muted">
           {quote.content}
         </span>
       )}
@@ -192,15 +193,30 @@ export function RichContent({
           </Link>,
         );
       } else if (token.startsWith("$")) {
-        result.push(
-          <span
-            key={`${index}-symbol`}
-            title="Halaman simbol hadir di Phase 6"
-            className="font-semibold text-accent"
-          >
-            {token.toUpperCase()}
-          </span>,
-        );
+        const symbol = token.slice(1).toUpperCase();
+        // Hanya simbol katalog yang ditautkan: $BTC (bukan BTCUSDT) tetap
+        // teks, bukan tautan mati ke halaman 404.
+        if (findSymbolEntry(symbol)) {
+          result.push(
+            <Link
+              key={`${index}-symbol`}
+              href={`/symbol/${symbol}`}
+              onClick={(event) => event.stopPropagation()}
+              className="font-semibold text-accent hover:underline"
+            >
+              {token.toUpperCase()}
+            </Link>,
+          );
+        } else {
+          result.push(
+            <span
+              key={`${index}-symbol`}
+              className="font-semibold text-accent"
+            >
+              {token.toUpperCase()}
+            </span>,
+          );
+        }
       } else {
         result.push(
           <a

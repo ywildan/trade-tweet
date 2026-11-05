@@ -38,6 +38,9 @@ export function SymbolPrice({
       }
     }
 
+    // Ambil langsung saat mount, bukan menunggu interval pertama 30 detik:
+    // bila quote server null, pengguna sebelumnya melihat "—" selama 30 detik.
+    void load();
     const timer = setInterval(load, 30_000);
     return () => {
       cancelled = true;

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { BackButton } from "@/components/ui/back-button";
 import Link from "next/link";
 
 import { PostCard } from "@/components/post/post-card";
@@ -41,15 +42,9 @@ export default async function SearchPage({ searchParams }: PageProps) {
     <>
       <header className="sticky top-0 z-20 border-b border-border bg-bg/65 backdrop-blur">
         <div className="flex h-[53px] items-center gap-3 px-3">
-          <Link
-            href="/"
-            aria-label="Kembali ke beranda"
-            className="-ml-1 rounded-full p-2 text-[20px] transition-colors hover:bg-text/10"
-          >
-            ←
-          </Link>
+          <BackButton />
           <div className="min-w-0 flex-1">
-            <SearchForm defaultValue={query} autoFocus />
+            <SearchForm defaultValue={query} autoFocus tab={tab} />
           </div>
         </div>
       </header>
@@ -120,8 +115,7 @@ export default async function SearchPage({ searchParams }: PageProps) {
             </section>
           )}
 
-          {(tab === "top" || tab === "users") &&
-            results.symbols.length > 0 && (
+          {tab === "top" && results.symbols.length > 0 && (
               <section className="border-b border-border px-4 py-4">
                 <h2 className="text-[20px] font-bold">Simbol</h2>
                 <div className="mt-3 flex flex-wrap gap-2">

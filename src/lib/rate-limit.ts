@@ -38,11 +38,21 @@ export async function enforceRateLimit({
   };
 }
 
-/** Identitas klien untuk rate limit berbasis IP (proxy-aware). */
+/**
+ * Identitas klien untuk rate limit berbasis IP.
+ * Ambil entri TERAKHIR X-Forwarded-For, bukan pertama: proxy tepercaya
+ * (mis. Vercel) menambahkan IP klien asli di ujung rantai, sedangkan
+ * entri pertama sepenuhnya dikendalikan pengirim dan bisa dipalsukan
+ * untuk memutar maupun menghabiskan kuota IP orang lain. Ini bukan
+ * perlindungan sempurna di luar proxy tepercaya — karena itu limit login
+ * juga diikat ke email (lihat route login).
+ */
 export function requestKey(request: Request): string {
   const forwarded = request.headers
     .get("x-forwarded-for")
-    ?.split(",")[0]
-    ?.trim();
-  return forwarded || request.headers.get("x-real-ip")?.trim() || "local";
+    ?.split(",")
+    .map((part) => part.trim())
+    .filter(Boolean);
+  const last = forwarded?.[forwarded.length - 1];
+  return last || request.headers.get("x-real-ip")?.trim() || "local";
 }

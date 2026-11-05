@@ -11,7 +11,13 @@ export function formatCount(n: number): string {
     return s;
   };
   if (n < 1000) return String(n);
-  if (n < 1_000_000) return `${fmt(n / 1000)} rb`;
+  // Pembulatan bisa menaikkan satuan: 999.950 -> "1000 rb" (salah),
+  // harusnya "1 jt". Naikkan satuan bila hasil bulatnya mencapai 1000.
+  if (n < 1_000_000) {
+    const rounded = Number((n / 1000).toFixed(1));
+    if (rounded >= 1000) return `${fmt(n / 1_000_000)} jt`;
+    return `${fmt(n / 1000)} rb`;
+  }
   return `${fmt(n / 1_000_000)} jt`;
 }
 

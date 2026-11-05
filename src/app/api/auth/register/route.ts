@@ -8,6 +8,15 @@ import { registerSchema } from "@/lib/validation";
 
 export async function POST(request: Request) {
   try {
+    // Validasi dulu: body tidak valid tidak boleh menghabiskan kuota.
+    const body = await request.json().catch(() => null);
+    const parsed = registerSchema.safeParse(body);
+    if (!parsed.success) {
+      return apiError("INVALID", "Data pendaftaran tidak valid.", 400, {
+        fieldErrors: parsed.error.flatten().fieldErrors,
+      });
+    }
+
     const limit = await enforceRateLimit({
       key: `register:${requestKey(request)}`,
       limit: 10,
@@ -23,14 +32,6 @@ export async function POST(request: Request) {
       return response;
     }
 
-    const body = await request.json().catch(() => null);
-    const parsed = registerSchema.safeParse(body);
-    if (!parsed.success) {
-      return apiError("INVALID", "Data pendaftaran tidak valid.", 400, {
-        fieldErrors: parsed.error.flatten().fieldErrors,
-      });
-    }
-
     const { username, name, email, password } = parsed.data;
 
     const existing = await prisma.user.findFirst({
@@ -38,11 +39,11 @@ export async function POST(request: Request) {
       select: { username: true, email: true },
     });
     if (existing) {
+      // Pesan generik: membedakan username vs email memungkinkan
+      // enumerasi akun (login sudah memakai pesan generik).
       return apiError(
         "CONFLICT",
-        existing.username === username
-          ? "Username sudah dipakai."
-          : "Email sudah terdaftar.",
+        "Username atau email sudah dipakai.",
         409,
       );
     }

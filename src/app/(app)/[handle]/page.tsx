@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { BackButton } from "@/components/ui/back-button";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { CalendarDays, MapPin } from "lucide-react";
@@ -19,6 +20,7 @@ import {
 } from "@/lib/posts";
 import { getSession } from "@/lib/session";
 import { getUserByUsername } from "@/lib/users";
+import { recordProfileView } from "@/lib/views";
 
 // Profil harus menunggu DB agar username tak dikenal bisa mengembalikan 404 asli.
 export const instant = false;
@@ -112,6 +114,17 @@ async function ProfileView({
       : Promise.resolve(false),
   ]);
 
+  // Tayangan profil (§7): sebelumnya tabel ProfileView tidak pernah ditulis,
+  // sehingga DailyStat.profileViews selalu 0. Gagal mencatat tidak boleh
+  // menggagalkan halaman profil.
+  if (!isSelf) {
+    try {
+      await recordProfileView(user.id, viewerId);
+    } catch (error) {
+      console.error("[profile] gagal mencatat tayangan", error);
+    }
+  }
+
   const stats = user.signalStat;
   const joined = new Intl.DateTimeFormat("id-ID", {
     month: "long",
@@ -147,13 +160,7 @@ async function ProfileView({
   return (
     <>
       <header className="sticky top-0 z-20 flex h-[53px] items-center gap-4 border-b border-border bg-bg/65 px-3 backdrop-blur">
-        <Link
-          href="/"
-          aria-label="Kembali ke beranda"
-          className="-ml-2 rounded-full p-2 text-[20px] transition-colors hover:bg-text/10"
-        >
-          ←
-        </Link>
+        <BackButton />
         <div className="min-w-0">
           <h1 className="truncate text-[20px] font-bold leading-6">{user.name}</h1>
           <p className="text-[13px] leading-4 text-text-muted">

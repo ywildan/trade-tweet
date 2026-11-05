@@ -62,6 +62,7 @@ export function NavLink({
     <Link
       href={href}
       title={label}
+      aria-label={label}
       aria-current={active ? "page" : undefined}
       className="flex w-fit items-center justify-center gap-4 rounded-full px-3 py-3 text-text transition-colors hover:bg-text/10 xl:w-full xl:justify-start"
     >

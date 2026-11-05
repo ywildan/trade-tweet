@@ -19,20 +19,25 @@ export async function awardBadgesForUser(userId: string): Promise<string[]> {
     }),
   ]);
 
-  if (!stat) return [];
-
-  const resolved = stat.tpsHit + stat.slsHit + stat.expired;
+  // Badge analyst tidak bergantung pada sinyal sama sekali, jadi tidak
+  // boleh terblokir hanya karena baris SignalStat belum ada.
+  const resolved = stat ? stat.tpsHit + stat.slsHit + stat.expired : 0;
   const longPosts = posts.filter((post) => countChars(post.content) >= 200).length;
   const have = new Set(existing.map((badge) => badge.type));
 
   const earned: Array<"sniper" | "consistent" | "profit_hunter" | "analyst"> = [];
-  if (stat.tpsHit >= 5 && stat.winRate >= 0.7 && resolved >= 10) {
+  if (
+    stat &&
+    stat.tpsHit >= 5 &&
+    stat.winRate >= 0.7 &&
+    resolved >= 10
+  ) {
     earned.push("sniper");
   }
-  if (resolved >= 10 && stat.winRate >= 0.6) {
+  if (stat && resolved >= 10 && stat.winRate >= 0.6) {
     earned.push("consistent");
   }
-  if (resolved >= 10 && stat.avgPnl >= 2) {
+  if (stat && resolved >= 10 && stat.avgPnl >= 2) {
     earned.push("profit_hunter");
   }
   if (longPosts >= 20) {

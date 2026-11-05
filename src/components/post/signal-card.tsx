@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 import { formatPrice, formatPnl } from "@/lib/format";
 import { SignalStatusChip } from "@/components/ui/badge";
 import type { MarketName } from "@/lib/symbols";
@@ -47,7 +49,12 @@ export function SignalCard({
   return (
     <div className="my-1.5 rounded-2xl border border-border bg-bg-elev p-3">
       <div className="flex flex-wrap items-center gap-2">
-        <span className="text-[15px] font-bold text-text">{symbol}</span>
+        <Link
+          href={`/symbol/${symbol}`}
+          className="text-[15px] font-bold text-text hover:underline"
+        >
+          {symbol}
+        </Link>
         <span
           className={`inline-flex items-center rounded-full px-2.5 py-[2px] text-xs font-semibold ${
             isLong ? "bg-long/15 text-long" : "bg-short/15 text-short"
@@ -66,22 +73,24 @@ export function SignalCard({
 
       <div className="mt-3 grid grid-cols-2 gap-x-2 gap-y-1.5 tabular">
         <Cell label="Entry" value={formatPrice(entry)} />
+        {/* Panah mengikuti arah harga, bukan label: untuk SHORT, TP ada di
+            bawah entry (▼) dan SL di atas entry (▲) — sebelumnya terbalik. */}
         <Cell
           label="TP"
           value={formatPrice(takeProfit)}
-          arrow="▲"
+          arrow={isLong ? "▲" : "▼"}
           color="text-long"
         />
         <Cell
           label="Stop Loss"
           value={formatPrice(stopLoss)}
-          arrow="▼"
+          arrow={isLong ? "▼" : "▲"}
           color="text-short"
         />
         <div className="flex items-center gap-2">
           <span className="text-[13px] text-text-muted">{pnlLabel}</span>
           <span className={`ml-auto text-[15px] font-bold ${pnlColor}`}>
-            {isCancelled ? "—" : `${formatPnl(pnl)} ●`}
+            {isCancelled ? "—" : formatPnl(pnl)}
           </span>
         </div>
       </div>

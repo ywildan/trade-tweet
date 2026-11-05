@@ -17,7 +17,7 @@ Spesifikasi produk: [`spesifikasi.md`](./spesifikasi.md) · Desain: [`DESIGN.md`
 
 ```bash
 pnpm install
-cp .env.example .env      # isi DATABASE_URL + AUTH_SECRET
+cp .env.example .env      # isi DATABASE_URL + AUTH_SECRET + CRON_SECRET
 
 # butuh PostgreSQL lokal, contoh:
 # createdb spmtrade
@@ -30,9 +30,16 @@ pnpm dev                  # http://localhost:3000
 Build produksi:
 
 ```bash
+pnpm db:deploy            # prisma migrate deploy (wajib sebelum start)
 pnpm build
 pnpm start
 ```
+
+Catatan produksi: `CRON_SECRET` wajib diisi, kalau tidak kedua cron
+menolak dengan 500. Cron `signal-check` sudah terdaftar di `vercel.json`
+tiap 5 menit; di plan Vercel Hobby yang membatasi cron harian, jadwalkan
+endpoint yang sama dari scheduler eksternal dengan header
+`Authorization: Bearer $CRON_SECRET`.
 
 ## Akun seed
 

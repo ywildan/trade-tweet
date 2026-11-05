@@ -3,6 +3,7 @@ import { countChars, POST_MAX_CHARS } from "@/lib/text";
 import {
   MARKETS,
   TIMEFRAMES,
+  findSymbolEntry,
   isMetalSymbol,
   type MarketName,
 } from "@/lib/symbols";
@@ -210,6 +211,18 @@ export const postSchema = z
           path: ["symbol"],
           message: "Simbol ini milik market METAL.",
         });
+      }
+      // Simbol di luar katalog tidak bisa di-resolve otomatis (feed menolak)
+      // dan akan terjebak OPEN selamanya — tolak sejak compose.
+      if (data.market === "CRYPTO") {
+        const entry = findSymbolEntry(data.symbol);
+        if (!entry || entry.market !== "CRYPTO") {
+          ctx.addIssue({
+            code: "custom",
+            path: ["symbol"],
+            message: "Simbol tidak ada di katalog crypto SPMTrade.",
+          });
+        }
       }
     }
 

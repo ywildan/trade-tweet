@@ -9,19 +9,7 @@ import { getTrendingSymbols } from "@/lib/trending";
 export async function RightRail() {
   const sessionUser = await getSessionUser();
 
-  const [users, follows, trending] = await Promise.all([
-    prisma.user.findMany({
-      take: 12,
-      select: {
-        id: true,
-        username: true,
-        name: true,
-        avatarUrl: true,
-        badges: { select: { type: true } },
-        signalStats: { select: { winRate: true, totalSignals: true } },
-        _count: { select: { followers: true } },
-      },
-    }),
+  const [follows, trending] = await Promise.all([
     sessionUser
       ? prisma.follow.findMany({
           where: { followerId: sessionUser.id },
@@ -32,23 +20,46 @@ export async function RightRail() {
   ]);
 
   const followed = new Set(follows.map((row) => row.followingId));
-  const candidates = users.filter((user) => user.id !== sessionUser?.id);
+  const excludeIds = [
+    ...(sessionUser ? [sessionUser.id] : []),
+    ...followed,
+  ];
 
-  const topTraders = [...candidates]
-    .sort(
-      (a, b) =>
-        (b.signalStats?.winRate ?? 0) - (a.signalStats?.winRate ?? 0) ||
-        (b.signalStats?.totalSignals ?? 0) - (a.signalStats?.totalSignals ?? 0),
-    )
-    .slice(0, 3);
+  const userSelect = {
+    id: true,
+    username: true,
+    name: true,
+    avatarUrl: true,
+    badges: { select: { type: true } },
+    signalStats: { select: { winRate: true, totalSignals: true } },
+    _count: { select: { followers: true } },
+  } as const;
 
-  const suggested = [...candidates]
-    .sort(
-      (a, b) =>
-        Number(followed.has(a.id)) - Number(followed.has(b.id)) ||
-        b._count.followers - a._count.followers,
-    )
-    .slice(0, 3);
+  // Urutkan di database, bukan 12 user pertama yang urutannya acak:
+  // "teratas" sebelumnya tidak pernah menampilkan trader terbaik di luar
+  // 12 pertama, dan "untuk diikuti" membuang slot untuk akun yang sudah
+  // diikuti. Judul lama "Trader minggu ini" juga menyesatkan karena
+  // datanya win-rate lifetime, bukan mingguan — diganti "Trader teratas".
+  const [topTraders, suggested] = await Promise.all([
+    prisma.user.findMany({
+      where: {
+        ...(sessionUser ? { id: { not: sessionUser.id } } : {}),
+        signalStats: { totalSignals: { gt: 0 } },
+      },
+      orderBy: [
+        { signalStats: { winRate: "desc" } },
+        { signalStats: { totalSignals: "desc" } },
+      ],
+      take: 3,
+      select: userSelect,
+    }),
+    prisma.user.findMany({
+      where: { id: { notIn: excludeIds } },
+      orderBy: { followers: { _count: "desc" } },
+      take: 3,
+      select: userSelect,
+    }),
+  ]);
 
   return (
     <div className="space-y-4 py-2">
@@ -90,7 +101,7 @@ export async function RightRail() {
 
       <RailCard
         icon={<Trophy size={18} className="text-gold" />}
-        title="Trader minggu ini"
+        title="Trader teratas"
       >
         {topTraders.length === 0 ? (
           <p className="py-4 text-[13px] text-text-muted">

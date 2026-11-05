@@ -80,6 +80,8 @@ export function FollowButton({
       onClick={toggle}
       onMouseEnter={() => setHover(true)}
       onMouseLeave={() => setHover(false)}
+      onFocus={() => setHover(true)}
+      onBlur={() => setHover(false)}
       disabled={busy}
       aria-pressed={following}
       aria-label={label}

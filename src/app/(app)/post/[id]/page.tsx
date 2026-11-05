@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { BackButton } from "@/components/ui/back-button";
 import { headers } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -118,13 +119,7 @@ export default async function PostPage({ params }: PageProps) {
   return (
     <>
       <header className="sticky top-0 z-20 flex h-[53px] items-center gap-4 border-b border-border bg-bg/65 px-3 backdrop-blur">
-        <Link
-          href="/"
-          aria-label="Kembali ke beranda"
-          className="-ml-2 rounded-full p-2 text-[20px] transition-colors hover:bg-text/10"
-        >
-          ←
-        </Link>
+        <BackButton />
         <div className="min-w-0">
           <h1 className="text-[20px] font-bold leading-6">Postingan</h1>
           <p className="text-[13px] leading-4 text-text-muted">
@@ -291,7 +286,8 @@ export default async function PostPage({ params }: PageProps) {
 
             <PostActions post={post} showShare={false} />
 
-            {post.status === "TP_HIT" && !post.disputed && (
+            {(post.status === "TP_HIT" || post.status === "SL_HIT") &&
+              !post.disputed && (
               <div className="mt-3">
                 <ShareResultButton postId={post.id} variant="full" />
               </div>

@@ -5,7 +5,23 @@ import { enabledOAuthProviders } from "@/lib/oauth";
 
 export const metadata = { title: "Daftar" };
 
-export default function RegisterPage() {
+// Halaman membaca ?next= untuk callback OAuth, jadi tidak bisa prerender.
+export const instant = false;
+
+function safeNext(raw: string | string[] | undefined): string {
+  const value = Array.isArray(raw) ? raw[0] : raw;
+  return value && value.startsWith("/") && !value.startsWith("//")
+    ? value
+    : "/";
+}
+
+export default async function RegisterPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ next?: string | string[] }>;
+}) {
+  const params = await searchParams;
+  const callbackUrl = safeNext(params.next);
   const { google, twitter } = enabledOAuthProviders;
 
   return (
@@ -17,7 +33,11 @@ export default function RegisterPage() {
 
       {(google || twitter) && (
         <div className="mt-6 space-y-4">
-          <OAuthButtons google={google} twitter={twitter} />
+          <OAuthButtons
+            google={google}
+            twitter={twitter}
+            callbackUrl={callbackUrl}
+          />
           <AuthDivider />
         </div>
       )}

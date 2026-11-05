@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { PenLine, X } from "lucide-react";
 
@@ -20,11 +20,23 @@ export function ComposeLauncher({
   const [open, setOpen] = useState(false);
   const router = useRouter();
   const pathname = usePathname();
+  const draftRef = useRef(false);
+
+  // DESIGN.md §9: konfirmasi "Buang postingan?" bila ada draf belum terkirim.
+  const requestClose = useCallback(() => {
+    if (
+      draftRef.current &&
+      !window.confirm("Buang postingan? Draf yang belum terkirim akan hilang.")
+    ) {
+      return;
+    }
+    setOpen(false);
+  }, []);
 
   useEffect(() => {
     if (!open) return;
     function onKeyDown(event: KeyboardEvent) {
-      if (event.key === "Escape") setOpen(false);
+      if (event.key === "Escape") requestClose();
     }
     document.addEventListener("keydown", onKeyDown);
     const previous = document.body.style.overflow;
@@ -33,7 +45,7 @@ export function ComposeLauncher({
       document.removeEventListener("keydown", onKeyDown);
       document.body.style.overflow = previous;
     };
-  }, [open]);
+  }, [open, requestClose]);
 
   if (variant === "fab") {
     if (
@@ -55,7 +67,7 @@ export function ComposeLauncher({
         >
           <PenLine size={23} />
         </button>
-        {open && <ComposeModal user={user} onClose={() => setOpen(false)} onPosted={() => { setOpen(false); router.refresh(); }} />}
+        {open && <ComposeModal user={user} onClose={requestClose} onDraftChange={(hasDraft) => { draftRef.current = hasDraft; }} onPosted={() => { setOpen(false); router.refresh(); }} />}
       </>
     );
   }
@@ -75,7 +87,7 @@ export function ComposeLauncher({
           Posting
         </span>
       </button>
-      {open && <ComposeModal user={user} onClose={() => setOpen(false)} onPosted={() => { setOpen(false); router.refresh(); }} />}
+      {open && <ComposeModal user={user} onClose={requestClose} onDraftChange={(hasDraft) => { draftRef.current = hasDraft; }} onPosted={() => { setOpen(false); router.refresh(); }} />}
     </>
   );
 }
@@ -83,10 +95,12 @@ export function ComposeLauncher({
 function ComposeModal({
   user,
   onClose,
+  onDraftChange,
   onPosted,
 }: {
   user: LauncherUser;
   onClose: () => void;
+  onDraftChange: (hasDraft: boolean) => void;
   onPosted: () => void;
 }) {
   return (
@@ -115,7 +129,7 @@ function ComposeModal({
           <span className="text-[15px] font-bold">Buat postingan</span>
           <span className="w-9" aria-hidden />
         </div>
-        <ComposeBox user={user} autoFocus onPosted={onPosted} />
+        <ComposeBox user={user} autoFocus onPosted={onPosted} onDraftChange={onDraftChange} />
       </div>
     </div>
   );

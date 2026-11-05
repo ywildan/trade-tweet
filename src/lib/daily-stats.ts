@@ -6,15 +6,23 @@ import {
   DAY_MS,
 } from "@/lib/days";
 
+export function isValidDay(input: string): boolean {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(input)) return false;
+  const parsed = new Date(`${input}T00:00:00.000Z`);
+  return (
+    !Number.isNaN(parsed.getTime()) &&
+    parsed.toISOString().slice(0, 10) === input
+  );
+}
+
 function normalizeDay(input?: string | null): string {
-  if (input && /^\d{4}-\d{2}-\d{2}$/.test(input)) {
-    const parsed = new Date(`${input}T00:00:00.000Z`);
-    if (
-      !Number.isNaN(parsed.getTime()) &&
-      parsed.toISOString().slice(0, 10) === input
-    ) {
-      return input;
+  if (input) {
+    // Hari yang eksplisit tapi tidak valid harus gagal, bukan diam-diam
+    // me-rollup kemarin (hari yang salah).
+    if (!isValidDay(input)) {
+      throw new Error("Hari tidak valid, pakai format YYYY-MM-DD.");
     }
+    return input;
   }
   return utcDay(new Date(Date.now() - DAY_MS));
 }

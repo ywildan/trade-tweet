@@ -6,7 +6,24 @@ import { enabledOAuthProviders } from "@/lib/oauth";
 
 export const metadata = { title: "Masuk" };
 
-export default function LoginPage() {
+// Halaman membaca ?next= untuk callback OAuth, jadi tidak bisa prerender.
+export const instant = false;
+
+function safeNext(raw: string | string[] | undefined): string {
+  const value = Array.isArray(raw) ? raw[0] : raw;
+  // Hanya path internal relatif, bukan //evil.com (open redirect).
+  return value && value.startsWith("/") && !value.startsWith("//")
+    ? value
+    : "/";
+}
+
+export default async function LoginPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ next?: string | string[] }>;
+}) {
+  const params = await searchParams;
+  const callbackUrl = safeNext(params.next);
   const { google, twitter } = enabledOAuthProviders;
 
   return (
@@ -19,7 +36,11 @@ export default function LoginPage() {
       <div className="mt-6 space-y-4">
         {(google || twitter) && (
           <>
-            <OAuthButtons google={google} twitter={twitter} />
+            <OAuthButtons
+              google={google}
+              twitter={twitter}
+              callbackUrl={callbackUrl}
+            />
             <AuthDivider />
           </>
         )}

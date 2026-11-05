@@ -1,8 +1,13 @@
+import { connection } from "next/server";
 import { formatPnl, formatPrice } from "@/lib/format";
 import { prisma } from "@/lib/db";
 import { computeSignalPnl } from "@/lib/signal-resolver";
 
 type Context = { params: Promise<{ postId: string }> };
+
+// Kartu harus selalu mencerminkan status/PnL terbaru: tandai dinamis
+// lewat connection() (segment config `dynamic` tidak kompatibel dengan
+// Cache Components di Next 16 dan menggagalkan build).
 
 function escapeXml(value: string) {
   return value
@@ -17,7 +22,8 @@ function escapeXml(value: string) {
  * GET /api/share-card/[postId] — kartu SVG 1200×675 (DESIGN.md §5.4).
  * Hanya sinyal TP_HIT / SL_HIT yang tidak disputed.
  */
-export async function GET(request: Request, context: Context) {
+async function getShareCard(request: Request, context: Context) {
+  await connection();
   const { postId } = await context.params;
 
   const post = await prisma.post.findFirst({
@@ -153,4 +159,19 @@ export async function GET(request: Request, context: Context) {
   }
 
   return new Response(svg, { status: 200, headers });
+}
+
+export async function GET(request: Request, context: Context) {
+  try {
+    return await getShareCard(request, context);
+  } catch (error) {
+    console.error("[share-card] gagal membuat kartu", error);
+    return Response.json(
+      {
+        ok: false,
+        error: { code: "INTERNAL", message: "Gagal membuat kartu share." },
+      },
+      { status: 500 },
+    );
+  }
 }

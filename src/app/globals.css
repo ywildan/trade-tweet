@@ -27,9 +27,23 @@
   --bg: #ffffff;
   --bg-elev: #f7f9f9;
   --bg-input: rgba(0, 0, 0, 0.03);
-  --border: #eff3f4;
+  /* Border lama #eff3f4 nyaris tak terlihat di atas putih. */
+  --border: #d0d7de;
   --text: #0f1419;
   --text-muted: #536471;
+  /* Token warna lama dioptimalkan untuk latar gelap: aksen #1d9bf0 dan
+     hijau LONG #00ba7c di atas putih hanya berkontras ~3,0 dan ~2,5
+     (di bawah ambang WCAG AA 4,5 untuk teks). Versi terang ini digelapkan
+     sampai lolos 4,5, tanpa mengubah token mode gelap. */
+  --accent: #0b6ea8;
+  --accent-hover: #095d8f;
+  --like: #c2185b;
+  --repost: #00875a;
+  --save: #0b6ea8;
+  --long: #00875a;
+  --short: #d92d20;
+  --gold: #8a6d00;
+  --verified: #0b6ea8;
 }
 
 @theme inline {

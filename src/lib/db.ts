@@ -9,14 +9,23 @@ import { PrismaClient } from "@/generated/prisma/client";
 
 const globalForPrisma = globalThis as unknown as { prisma?: PrismaClient };
 
+// Fallback lokal hanya untuk development: di production, DATABASE_URL yang
+// lupa diset harus gagal cepat dengan pesan jelas, bukan diam-diam mencoba
+// Postgres lokal lalu gagal dengan error koneksi yang membingungkan.
+const connectionString =
+  process.env.DATABASE_URL ??
+  (process.env.NODE_ENV === "production"
+    ? undefined
+    : "postgresql://postgres:postgres@localhost:5432/spmtrade");
+
+if (!connectionString) {
+  throw new Error("DATABASE_URL belum diset.");
+}
+
 export const prisma =
   globalForPrisma.prisma ??
   new PrismaClient({
-    adapter: new PrismaPg({
-      connectionString:
-        process.env.DATABASE_URL ??
-        "postgresql://postgres:postgres@localhost:5432/spmtrade",
-    }),
+    adapter: new PrismaPg({ connectionString }),
   });
 
 if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = prisma;

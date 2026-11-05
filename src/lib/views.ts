@@ -6,13 +6,57 @@ import { prisma } from "@/lib/db";
  * Detail post = +1 view per (user|IP hash, post) per hari (spesifikasi.md §7).
  * Unique PostView membuat render berulang tidak menambah angka.
  */
+/** Tayangan profil, dedupe per (profil|IP hash, hari) seperti post view. */
+export async function recordProfileView(
+  profileId: string,
+  userId: string | null,
+): Promise<boolean> {
+  const headerStore = await headers();
+  const forwarded = headerStore
+    .get("x-forwarded-for")
+    ?.split(",")
+    .map((part) => part.trim())
+    .filter(Boolean);
+  const ip =
+    forwarded?.[forwarded.length - 1] ||
+    headerStore.get("x-real-ip") ||
+    "local";
+  const viewerKey =
+    userId ?? createHash("sha256").update(ip).digest("hex").slice(0, 32);
+  const day = new Date().toISOString().slice(0, 10);
+
+  try {
+    await prisma.profileView.create({
+      data: { profileId, viewerKey, day },
+    });
+    return true;
+  } catch (error) {
+    const code =
+      typeof error === "object" && error !== null && "code" in error
+        ? (error as { code?: string }).code
+        : undefined;
+    if (code === "P2002") return false;
+    throw error;
+  }
+}
+
 export async function recordPostView(
   postId: string,
   userId: string | null,
 ): Promise<boolean> {
   const headerStore = await headers();
-  const forwarded = headerStore.get("x-forwarded-for")?.split(",")[0]?.trim();
-  const ip = forwarded || headerStore.get("x-real-ip") || "local";
+  // Entri terakhir X-Forwarded-For (lihat requestKey di rate-limit.ts):
+  // entri pertama dikendalikan pengirim dan bisa diputar untuk
+  // menggelembungkan view tamu.
+  const forwarded = headerStore
+    .get("x-forwarded-for")
+    ?.split(",")
+    .map((part) => part.trim())
+    .filter(Boolean);
+  const ip =
+    forwarded?.[forwarded.length - 1] ||
+    headerStore.get("x-real-ip") ||
+    "local";
   const viewerKey =
     userId ?? createHash("sha256").update(ip).digest("hex").slice(0, 32);
   const day = new Date().toISOString().slice(0, 10);

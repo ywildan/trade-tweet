@@ -113,7 +113,7 @@ font-family: -apple-system, "Segoe UI", Roboto, "Helvetica Neue",
 | `@/[username]` | Banner 3:1 → avatar 120px overlap -60px → nama+badge → handle → bio → meta (join date, lokasi, jumlah following/followers klik → modal list) → tombol Follow/Edit profil → statistik strip mini (win-rate, total sinyal, avg pnl) → tab: Sinyal \| Balasan \| Repost \| Simpan (jika self view) |
 | `/post/[id]` | Root post besar (konten 17px) + statistik strip (views, repost, quote, like, bookmark, waktu) + compose reply inline + list reply. |
 | `/compose` (modal & halaman) | Avatar + textarea autosize (max 280) + counter bulat + toggle "Ini sinyal" → form grid 2 kolom (lihat §6). |
-| `/notifications` | tab Semua \| Disematkan. Item: ikon jenis aksi (like pink, repost hijau, follow biru, sinyal resolve 🎯) + teks + post terkait kecil. |
+| `/notifications` | tab Semua \| Belum dibaca (perbaikan dokumen 2026-11-05: implementasi memakai filter Belum dibaca, bukan Disematkan). Item: ikon jenis aksi (like pink, repost hijau, follow biru, sinyal resolve 🎯) + teks + post terkait kecil. |
 | `/bookmarks` | list simpanan + tombol hapus dari simpanan. |
 | `/dashboard` | grid kartu 2×2 + grafik 2 baris (detail Phase 5 di spesifikasi.md). |
 | `/admin/badges` | khusus admin: daftar user + tombol beri/cabut badge manual. |

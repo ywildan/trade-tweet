@@ -15,7 +15,10 @@ export const metadata: Metadata = {
 export const instant = false;
 
 type PageProps = {
-  searchParams: Promise<{ filter?: string | string[] }>;
+  searchParams: Promise<{
+    filter?: string | string[];
+    cursor?: string | string[];
+  }>;
 };
 
 export default async function NotificationsPage({ searchParams }: PageProps) {
@@ -25,10 +28,14 @@ export default async function NotificationsPage({ searchParams }: PageProps) {
   const params = await searchParams;
   const raw = Array.isArray(params.filter) ? params.filter[0] : params.filter;
   const unreadOnly = raw === "unread";
+  const rawCursor = Array.isArray(params.cursor)
+    ? params.cursor[0]
+    : params.cursor;
 
-  const { items, unreadCount } = await getNotifications({
+  const { items, nextCursor, unreadCount } = await getNotifications({
     userId: user.id,
     unreadOnly,
+    cursor: rawCursor ?? null,
   });
 
   return (
@@ -80,9 +87,24 @@ export default async function NotificationsPage({ searchParams }: PageProps) {
       </nav>
 
       {items.length > 0 ? (
-        items.map((notification) => (
-          <NotificationItem key={notification.id} notification={notification} />
-        ))
+        <>
+          {items.map((notification) => (
+            <NotificationItem
+              key={notification.id}
+              notification={notification}
+            />
+          ))}
+          {nextCursor && (
+            <div className="py-4 text-center">
+              <Link
+                href={`/notifications${unreadOnly ? "?filter=unread&" : "?"}cursor=${encodeURIComponent(nextCursor)}`}
+                className="rounded-2xl border border-border px-4 py-2 text-[14px] font-semibold hover:bg-text/[0.03]"
+              >
+                Muat lebih banyak
+              </Link>
+            </div>
+          )}
+        </>
       ) : (
         <EmptyState
           title={unreadOnly ? "Tidak ada yang belum dibaca" : "Belum ada notifikasi"}

@@ -27,6 +27,8 @@ type ComposeBoxProps = {
   quote?: QuotePost | null;
   autoFocus?: boolean;
   onPosted?: (post: FeedPost) => void;
+  /** Dipanggil tiap kali status draf berubah (untuk konfirmasi buang draf). */
+  onDraftChange?: (hasDraft: boolean) => void;
 };
 
 const MARKET_LABEL: Record<MarketName, string> = {
@@ -49,6 +51,7 @@ export function ComposeBox({
   quote = null,
   autoFocus = false,
   onPosted,
+  onDraftChange,
 }: ComposeBoxProps) {
   const router = useRouter();
   const isReply = Boolean(replyTo);
@@ -81,6 +84,16 @@ export function ComposeBox({
     element.style.height = "auto";
     element.style.height = `${Math.min(element.scrollHeight, 320)}px`;
   }, [content]);
+
+  const hasDraft =
+    content.trim().length > 0 ||
+    symbol.trim().length > 0 ||
+    entry.trim().length > 0 ||
+    takeProfit.trim().length > 0 ||
+    stopLoss.trim().length > 0;
+  useEffect(() => {
+    onDraftChange?.(hasDraft);
+  }, [hasDraft, onDraftChange]);
 
   const liveErrors = useMemo(() => {
     const result: Record<string, string> = {};
@@ -123,6 +136,8 @@ export function ComposeBox({
         result.symbol = "Simbol ini milik market METAL.";
       } else if (meta && meta.market !== market) {
         result.symbol = `Simbol ini milik market ${meta.market}.`;
+      } else if (market === "CRYPTO" && !meta) {
+        result.symbol = "Simbol tidak ada di katalog crypto SPMTrade.";
       }
     }
 
@@ -166,10 +181,19 @@ export function ComposeBox({
     }
   }
 
+  // Tombol Posting harus nonaktif saat sinyal belum lengkap, bukan baru
+  // gagal setelah diklik: field kosong atau liveErrors apa pun memblokir.
+  const signalComplete =
+    !isSignalActive ||
+    (symbol.trim().length > 0 &&
+      toNumber(entry) != null &&
+      toNumber(takeProfit) != null &&
+      toNumber(stopLoss) != null &&
+      Object.keys(liveErrors).length === 0);
   const canSubmit =
     !submitting &&
     remaining >= 0 &&
-    (isSignalActive || content.trim().length > 0);
+    (isSignalActive ? signalComplete : content.trim().length > 0);
 
   async function handleSubmit() {
     if (!canSubmit) return;
@@ -541,14 +565,23 @@ function SignalFields({
               spellCheck={false}
               placeholder="BTCUSDT"
               aria-invalid={Boolean(fieldError("symbol"))}
+              aria-expanded={symbolFocused && suggestions.length > 0}
+              aria-controls="signal-symbol-suggestions"
+              role="combobox"
               className={inputClass}
             />
             {symbolFocused && suggestions.length > 0 && (
-              <div className="absolute z-30 mt-1 max-h-56 w-full overflow-y-auto rounded-xl border border-border bg-bg-elev py-1 shadow-xl">
+              <div
+                id="signal-symbol-suggestions"
+                role="listbox"
+                className="absolute z-30 mt-1 max-h-56 w-full overflow-y-auto rounded-xl border border-border bg-bg-elev py-1 shadow-xl"
+              >
                 {suggestions.map((item) => (
                   <button
                     key={item.symbol}
                     type="button"
+                    role="option"
+                    aria-selected={false}
                     onMouseDown={(event) => {
                       event.preventDefault();
                       onSymbolChange(item.symbol);

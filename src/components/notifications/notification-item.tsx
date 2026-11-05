@@ -1,3 +1,5 @@
+"use client";
+
 import Link from "next/link";
 import {
   AtSign,
@@ -48,6 +50,14 @@ export function NotificationItem({
   return (
     <Link
       href={href}
+      onClick={() => {
+        // Tandai dibaca saat dibuka; gagalnya tidak boleh menghalangi navigasi.
+        if (unread) {
+          void fetch(`/api/notifications/${notification.id}/read`, {
+            method: "POST",
+          }).catch(() => {});
+        }
+      }}
       className={`flex gap-3 border-b border-border px-4 py-3 transition-colors hover:bg-text/[0.03] ${
         unread ? "bg-accent/[0.04]" : ""
       }`}

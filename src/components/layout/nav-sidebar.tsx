@@ -97,7 +97,7 @@ export async function NavSidebar() {
             <Link href="/login" className="block">
               <Button className="w-full">Masuk</Button>
             </Link>
-            <Link href="/register" className="hidden xl:block">
+            <Link href="/register" className="block">
               <Button variant="secondary" className="w-full">
                 Daftar
               </Button>

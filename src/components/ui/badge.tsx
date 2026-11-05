@@ -59,6 +59,7 @@ export function ReputationBadge({
         size === "sm" ? "px-2 py-[1px] text-[11px]" : "px-2.5 py-[2px] text-xs"
       }`}
       title={label}
+      aria-label={label}
     >
       {size === "sm" ? label.split(" ")[0] : label}
     </span>

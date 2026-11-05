@@ -9,13 +9,30 @@ export const metadata: Metadata = { title: "Admin · Badge" };
 
 export const instant = false;
 
-export default async function AdminBadgesPage() {
+export default async function AdminBadgesPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ q?: string | string[] }>;
+}) {
   const user = await getSessionUser();
   if (!user) redirect("/login?next=%2Fadmin%2Fbadges");
   if (user.role !== "admin") notFound();
 
+  const params = await searchParams;
+  const rawQ = Array.isArray(params.q) ? params.q[0] : params.q;
+  const query = (rawQ ?? "").trim();
+
   const users = await prisma.user.findMany({
+    where: query
+      ? {
+          OR: [
+            { username: { contains: query, mode: "insensitive" } },
+            { name: { contains: query, mode: "insensitive" } },
+          ],
+        }
+      : undefined,
     orderBy: { username: "asc" },
+    take: 50,
     select: {
       id: true,
       username: true,
@@ -37,6 +54,36 @@ export default async function AdminBadgesPage() {
           </p>
         </div>
       </header>
+
+      <form
+        action="/admin/badges"
+        method="get"
+        role="search"
+        className="flex gap-2 border-b border-border px-4 py-3"
+      >
+        <label className="sr-only" htmlFor="admin-user-search">
+          Cari pengguna
+        </label>
+        <input
+          id="admin-user-search"
+          type="search"
+          name="q"
+          defaultValue={query}
+          placeholder="Cari username atau nama…"
+          className="w-full rounded-xl border border-border bg-bg-input px-3 py-2 text-[14px] outline-none placeholder:text-text-muted"
+        />
+        <button
+          type="submit"
+          className="rounded-xl bg-accent px-4 py-2 text-[14px] font-semibold text-white"
+        >
+          Cari
+        </button>
+      </form>
+      {users.length === 50 && (
+        <p className="border-b border-border px-4 py-2 text-[13px] text-text-muted">
+          Menampilkan maksimal 50 pengguna — persempit dengan pencarian.
+        </p>
+      )}
 
       <AdminBadgeList
         users={users.map((row) => ({

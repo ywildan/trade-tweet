@@ -1,9 +1,14 @@
+import { connection } from "next/server";
 import { ImageResponse } from "next/og";
 
 import { prisma } from "@/lib/db";
 import { formatPnl, formatPrice } from "@/lib/format";
 
 type Context = { params: Promise<{ postId: string }> };
+
+// Gambar OG harus mencerminkan status/PnL terbaru: tandai dinamis lewat
+// connection() (segment config `dynamic` tidak kompatibel dengan Cache
+// Components di Next 16 dan menggagalkan build).
 
 const BG = "#0b0f14";
 const TEXT = "#e7e9ea";
@@ -16,7 +21,8 @@ const ACCENT = "#1d9bf0";
  * GET /api/og/[postId] — gambar OG 1200×630 (spesifikasi.md §4 Phase 6).
  * Memakai ImageResponse bawaan Next (satori/resvg), tanpa dependency tambahan.
  */
-export async function GET(_request: Request, context: Context) {
+async function getOg(_request: Request, context: Context) {
+  await connection();
   const { postId } = await context.params;
 
   const post = await prisma.post.findFirst({
@@ -206,4 +212,13 @@ export async function GET(_request: Request, context: Context) {
       },
     },
   );
+}
+
+export async function GET(request: Request, context: Context) {
+  try {
+    return await getOg(request, context);
+  } catch (error) {
+    console.error("[og] gagal membuat gambar", error);
+    return new Response("Gagal membuat gambar OG", { status: 500 });
+  }
 }

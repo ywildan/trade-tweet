@@ -72,13 +72,16 @@ export function findSymbolEntry(symbol: string): SymbolEntry | undefined {
 
 export function searchSymbols(query: string, market: MarketName, limit = 8) {
   const q = query.trim().toUpperCase();
-  return SYMBOL_CATALOG.filter(
-    (entry) =>
-      entry.market === market &&
-      (q === "" ||
-        entry.symbol.includes(q) ||
-        entry.name.toUpperCase().includes(q)),
-  ).slice(0, limit);
+  return SYMBOL_CATALOG.filter((entry) => {
+    if (entry.market !== market) return false;
+    if (q === "") return true;
+    // Nama dicocokkan per awal kata (seperti searchCatalog), bukan
+    // substring: "eth" tidak boleh membanjiri hasil "TetherUS".
+    const tokens = entry.name.toUpperCase().split(/[^A-Z0-9]+/);
+    return (
+      entry.symbol.includes(q) || tokens.some((token) => token.startsWith(q))
+    );
+  }).slice(0, limit);
 }
 
 /**

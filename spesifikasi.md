@@ -47,8 +47,8 @@ Pilar produk:
 | Styling | **Tailwind CSS v4** | Token di `src/app/globals.css` via CSS variables + `@theme inline` (Tailwind v4 = CSS-first, tidak ada `tailwind.config.ts`). Konvensi class util color: `bg-bg`, `bg-bg-elev`, `border-border`, `text-text-muted`, `text-accent`, `text-long`, `text-short`, dll. |
 | Auth | **NextAuth (Auth.js) credentials + OAuth (Google, X/Twitter)** | Password hash bcrypt/argon2. |
 | Validasi | **Zod** | Schema validasi dipakai ulang client & server. |
-| State/data client | **TanStack Query + fetch** | Tanpa Redux. |
-| Feed harga | **Abstraksi `PriceFeed`** per market — implementasi: (1) **CRYPTO → Binance public REST** (`/api/v3/ticker`, kline) tanpa API key; (2) **METAL/FOREX/STOCK → Yahoo Finance chart endpoint** (`query1.finance.yahoo.com/v8/finance/chart/XAUUSD=X`, `XAGUSD=X`, `AAPL`) tanpa API key (data bisa delay beberapa menit — acceptable, bisa dioverride manual). Semua provider cache 60s + rate-limit sederhana. | Mendukung sinyal crypto & metal sejak Phase 4. |
+| State/data client | **fetch langsung + IntersectionObserver** | Tanpa Redux; TanStack Query tidak dipakai (tidak ada di package.json). |
+| Feed harga | **Abstraksi `PriceFeed`** per market — implementasi: (1) **CRYPTO → Binance public REST** (`/api/v3/ticker`, kline) tanpa API key; (2) **METAL/FOREX/STOCK → Yahoo Finance chart endpoint** (`query1.finance.yahoo.com/v8/finance/chart/GC=F` untuk XAUUSD, `SI=F` untuk XAGUSD — simbol spot `XAUUSD=X` sudah delisted Yahoo) tanpa API key (data bisa delay beberapa menit — acceptable, bisa dioverride manual). Semua provider cache 60s + rate-limit sederhana. | Mendukung sinyal crypto & metal sejak Phase 4. |
 | Ikon | **lucide-react**. Font: stack sistem (lihat DESIGN.md). | |
 | Testing (fase akhir) | Vitest (unit/util) — opsional untuk fase awal | |
 
@@ -209,7 +209,7 @@ Like, Repost (repost ke profil + quote), Komen (reply), Simpan (bookmark + halam
 > ✅ **Status:** SELESAI (2026-11-04). Like/repost/simpan toggle optimistis dengan rollback + toast global ([`toast.tsx`](src/components/ui/toast.tsx), [`post-actions.tsx`](src/components/post/post-actions.tsx)); menu repost berisi Repost/Batalkan + **Kutip postingan** (compose `/compose?quote=` dengan preview). Simpanan di `/bookmarks`; follow/unfollow di profil + UserCard right rail (hover "Berhenti ikuti" merah). Profil menambah tab Sticky **Sinyal / Balasan / Repost / Simpan** (Simpan hanya self). Notifikasi in-app untuk like/repost/reply/follow + badge unread di nav desktop/mobile, halaman `/notifications` dengan filter Semua/Belum dibaca dan "Tandai semua dibaca". API baru: `POST/DELETE /api/posts/[id]/like|repost|bookmark`, `GET /api/posts/[id]/replies`, `POST/DELETE /api/users/[username]/follow`, `GET /api/notifications`, `POST /api/notifications/read-all`, `GET /api/users/[username]/posts?tab=`. Seed menambah 3 repost, 3 simpanan, 9 notifikasi. `pnpm build` ✔, `pnpm lint` ✔.
 
 ### Phase 4 — Siklus Sinyal, Badge & Kartu Share (FITUR PENJUAL UTAMA)
-1. **Auto-resolve:** route `/api/cron/signal-check` (dipanggil cron tiap 1–5 menit) mem-batch semua `status=OPEN`: fetch harga symbol lewat `PriceFeed` sesuai market (CRYPTO → Binance; METAL/FOREX/STOCK → Yahoo Finance chart, simbol termap: `XAUUSD`→`XAUUSD=X`, `XAGUSD`→`XAGUSD=X`), cek touch TP/SL (high/low rentang entry-time→now), set `TP_HIT`/`SL_HIT`, hitung `pnlPercent`, notifikasi pembuat sinyal. 2. **Override manual:** pembuat sinyal bisa finalisasi bila API/data delay atau tidak akurat ("Close Manual" + alasan). 3. **EXPIRED:** bila lebih 3× timeframe tanpa touch TP/SL, tandai EXPIRED (pnl = perubahan harga saat itu).
+1. **Auto-resolve:** route `/api/cron/signal-check` (dipanggil cron tiap 1–5 menit) mem-batch semua `status=OPEN`: fetch harga symbol lewat `PriceFeed` sesuai market (CRYPTO → Binance; METAL/FOREX/STOCK → Yahoo Finance chart, simbol termap: `XAUUSD`→`GC=F`, `XAGUSD`→`SI=F`), cek touch TP/SL (high/low rentang entry-time→now), set `TP_HIT`/`SL_HIT`, hitung `pnlPercent`, notifikasi pembuat sinyal. 2. **Override manual:** pembuat sinyal bisa finalisasi bila API/data delay atau tidak akurat ("Close Manual" + alasan). 3. **EXPIRED:** bila lebih 3× timeframe tanpa touch TP/SL, tandai EXPIRED (pnl = perubahan harga saat itu).
    - **Breakdown teknis:** buat interface `PriceFeed { getQuote(symbol): { price, ts } }` + factory pilih provider dari `Post.market`. Jangan hardcode Binance di logic resolve. Yahoo rate-limited: worker kerjakan batch max 20 simbol per menit, pakai cache. Feed gagal → logging normal, sinyal tetap OPEN, retry siklus berikutnya.
 2. **Badge otomatis** sesuai tabel §9 (Query gate dihitung dari SignalStat).
 3. **Kartu Share SVG:** endpoint `GET /api/share-card/[postId]` → `image/svg+xml` (1200×675), layout sesuai DESIGN.md §5.4 (brand, ticker, arah, entry→TP/SL, pnl besar, win-rate pembuat, handle @username). Tombol "Bagikan Hasil" di post yang TP_HIT: download SVG (header `Content-Disposition`) + Copy-link.
@@ -296,7 +296,7 @@ Skor = `recencyScore * 1.0 + authorFollowBonus * 2.0 + engagementScore * 0.5 + s
 ## 8. Aturan Siklus Sinyal (detail resolve — WAJIB dibaca agent Phase 4)
 
 1. Sinyal dibuat `OPEN` (hanya `isSignal=true`).
-2. Cron cek setiap menit-an, provider per market (CRYPTO → Binance; METAL → Yahoo `XAUUSD=X` dll):
+2. Cron cek setiap menit-an, provider per market (CRYPTO → Binance; METAL → Yahoo futures (`GC=F` dll)):
    - LONG: TP_HIT bila `price >= TP`; SL_HIT bila `price <= SL`.
    - SHORT: TP_HIT bila `price <= TP`; SL_HIT bila `price >= SL`.
    - Prioritas SL jika keduanya ter-touch pada rentang candle yang sama (konservatif).
@@ -400,6 +400,7 @@ Phase 6: [x]
 | 2026-11-04 | 6 | Rate limit tabel DB dengan jendela dibulatkan: login/register 10/menit per IP, posting 10/menit per user | Cegah brute-force & spam tanpa Redis; kompatibel multi-instance |
 | 2026-11-04 | 6 | Admin hanya mengelola `verified` & `curator`; badge otomatis tetap dari cron; notifikasi hanya saat badge baru | Sesuai §9 dan menghindari notifikasi ganda |
 | 2026-11-04 | 6 | URL `og:image` dibangun absolut dari `x-forwarded-host`/`x-forwarded-proto` | Metadata `og:image` wajib URL absolut |
+| 2026-11-05 | audit | Perbaikan audit: TP/SL kronologis per candle (prioritas SL hanya dalam candle yang sama), expiry tanpa bergantung feed (PnL null tidak merusak avg), interval Yahoo 1h (bukan 4h yang tidak valid), simbol CRYPTO wajib katalog, resolve manual tanpa bukti feed = disputed, cron signal-check di vercel.json tiap 5 menit, rate limit login diikat IP+email, dan perbaikan UI (feed retry, right rail, token terang, simbol klik, dsb.) | Audit 2026-11-05; terverifikasi tsc --noEmit, eslint, dan next build (build awal sempat gagal karena segment config dynamic tidak kompatibel dengan Cache Components dan prerender /login — keduanya diperbaiki, lihat share-card/og dan halaman login/register) |
 
 ### Catatan operasional Phase 1
 

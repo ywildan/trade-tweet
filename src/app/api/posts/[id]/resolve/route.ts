@@ -1,6 +1,7 @@
 import { auth } from "@/auth";
 import { apiError, apiOk, handleApiError } from "@/lib/api";
 import { prisma } from "@/lib/db";
+import { getPriceFeed } from "@/lib/price-feed";
 import { resolveSignal } from "@/lib/signal-resolver";
 import { resolveSignalSchema } from "@/lib/validation";
 
@@ -23,8 +24,11 @@ export async function POST(request: Request, context: Context) {
         isSignal: true,
         status: true,
         direction: true,
+        market: true,
+        symbol: true,
         takeProfit: true,
         stopLoss: true,
+        createdAt: true,
       },
     });
 
@@ -53,20 +57,55 @@ export async function POST(request: Request, context: Context) {
       select: { price: true },
     });
 
+    // Bukti feed harus berupa high/low sejak entry, bukan close terakhir:
+    // TP yang tersentuh lalu harga kembali tidak boleh ditandai disputed,
+    // dan klaim tanpa bukti feed apa pun harus ditandai disputed.
     let disputed = false;
-    if (lastCheck && post.direction) {
-      const price = lastCheck.price;
-      if (parsed.data.outcome === "TP_HIT" && post.takeProfit != null) {
-        disputed =
-          post.direction === "LONG"
-            ? price < post.takeProfit
-            : price > post.takeProfit;
+    if (parsed.data.outcome !== "CANCELLED" && post.direction) {
+      let rangeChecked = false;
+      if (post.market && post.symbol) {
+        try {
+          const range = await getPriceFeed(post.market).getRange(
+            post.symbol,
+            post.createdAt,
+            new Date(),
+          );
+          rangeChecked = true;
+          if (parsed.data.outcome === "TP_HIT" && post.takeProfit != null) {
+            disputed =
+              post.direction === "LONG"
+                ? range.high < post.takeProfit
+                : range.low > post.takeProfit;
+          }
+          if (parsed.data.outcome === "SL_HIT" && post.stopLoss != null) {
+            disputed =
+              post.direction === "LONG"
+                ? range.low > post.stopLoss
+                : range.high < post.stopLoss;
+          }
+        } catch {
+          // Jatuh ke pemeriksaan close terakhir di bawah.
+        }
       }
-      if (parsed.data.outcome === "SL_HIT" && post.stopLoss != null) {
-        disputed =
-          post.direction === "LONG"
-            ? price > post.stopLoss
-            : price < post.stopLoss;
+      if (!rangeChecked) {
+        if (!lastCheck) {
+          // Tidak ada snapshot feed sama sekali: klaim tidak terbukti.
+          disputed = true;
+        } else {
+          const price = lastCheck.price;
+          if (parsed.data.outcome === "TP_HIT" && post.takeProfit != null) {
+            disputed =
+              post.direction === "LONG"
+                ? price < post.takeProfit
+                : price > post.takeProfit;
+          }
+          if (parsed.data.outcome === "SL_HIT" && post.stopLoss != null) {
+            disputed =
+              post.direction === "LONG"
+                ? price > post.stopLoss
+                : price < post.stopLoss;
+          }
+        }
       }
     }
 

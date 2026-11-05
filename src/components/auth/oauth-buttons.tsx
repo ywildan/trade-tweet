@@ -7,9 +7,12 @@ import { Button } from "@/components/ui/button";
 export function OAuthButtons({
   google,
   twitter,
+  callbackUrl = "/",
 }: {
   google: boolean;
   twitter: boolean;
+  /** Tujuan setelah login (dari ?next=), divalidasi di halaman login. */
+  callbackUrl?: string;
 }) {
   const [pending, setPending] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -20,7 +23,7 @@ export function OAuthButtons({
     setPending(provider);
     setError(null);
     try {
-      await signIn(provider, { callbackUrl: "/" });
+      await signIn(provider, { callbackUrl });
     } catch {
       setError("Gagal memulai login OAuth. Coba lagi.");
       setPending(null);

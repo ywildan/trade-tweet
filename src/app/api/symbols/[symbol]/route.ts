@@ -14,7 +14,7 @@ export async function GET(_request: Request, context: Context) {
     const symbol = decodeURIComponent(raw).toUpperCase();
 
     if (!/^[A-Z0-9]{2,20}$/.test(symbol)) {
-      return apiError("NOT_FOUND", "Simbol tidak valid.", 404);
+      return apiError("INVALID", "Simbol tidak valid.", 400);
     }
 
     const market = inferMarket(symbol);

@@ -1,7 +1,7 @@
 import { timingSafeEqual } from "node:crypto";
 import { connection } from "next/server";
 import { apiError, apiOk, handleApiError } from "@/lib/api";
-import { refreshDailyStats } from "@/lib/daily-stats";
+import { isValidDay, refreshDailyStats } from "@/lib/daily-stats";
 
 export const maxDuration = 60;
 
@@ -33,7 +33,15 @@ async function handle(request: Request) {
 
   try {
     const { searchParams } = new URL(request.url);
-    const summary = await refreshDailyStats(searchParams.get("day") ?? undefined);
+    const day = searchParams.get("day");
+    if (day !== null && !isValidDay(day)) {
+      return apiError(
+        "INVALID",
+        "Parameter day tidak valid, pakai format YYYY-MM-DD.",
+        400,
+      );
+    }
+    const summary = await refreshDailyStats(day ?? undefined);
     return apiOk(summary);
   } catch (error) {
     return handleApiError(error);

@@ -75,6 +75,20 @@ function intervalForSpan(spanMs: number): string {
   return "1d";
 }
 
+/**
+ * Interval Yahoo terpisah dari Binance: Yahoo tidak mendukung "4h".
+ * Interval Yahoo yang valid antara lain 1m/5m/15m/1h/1d, jadi rentang
+ * >7 hari sampai 30 hari memakai 1h, bukan 4h.
+ */
+function intervalForYahoo(spanMs: number): string {
+  const hours = spanMs / 3_600_000;
+  if (hours <= 2) return "1m";
+  if (hours <= 12) return "5m";
+  if (hours <= 48) return "15m";
+  if (hours <= 24 * 30) return "1h";
+  return "1d";
+}
+
 /* ------------------------------------------------------------------ */
 /* Binance (CRYPTO)                                                   */
 /* ------------------------------------------------------------------ */
@@ -365,7 +379,7 @@ class YahooFeed implements PriceFeed {
   private async loadRange(symbol: string, from: Date, to: Date) {
     const start = Math.max(0, Math.floor(from.getTime() / 1000));
     const end = Math.max(start + 60, Math.floor(to.getTime() / 1000));
-    const interval = intervalForSpan((end - start) * 1000);
+    const interval = intervalForYahoo((end - start) * 1000);
 
     let lastError: unknown = null;
     for (const candidate of yahooCandidates(symbol)) {
@@ -432,7 +446,7 @@ class YahooFeed implements PriceFeed {
   private async loadCandles(symbol: string, from: Date, to: Date) {
     const start = Math.max(0, Math.floor(from.getTime() / 1000));
     const end = Math.max(start + 60, Math.floor(to.getTime() / 1000));
-    const interval = intervalForSpan((end - start) * 1000);
+    const interval = intervalForYahoo((end - start) * 1000);
 
     let lastError: unknown = null;
     for (const candidate of yahooCandidates(symbol)) {
