@@ -47,7 +47,7 @@ export async function generateMetadata({
       ? `Sinyal ${row.symbol} dari @${row.author.username}`
       : `Postingan @${row.author.username}`);
 
-  const title = `${snippet} — @${row.author.username}`;
+  const title = `${snippet} · @${row.author.username}`;
   const description = `Postingan ${row.author.name} di Neuraly.`;
 
   const headerStore = await headers();
@@ -118,7 +118,7 @@ export default async function PostPage({ params }: PageProps) {
 
   return (
     <>
-      <header className="sticky top-0 z-20 flex h-[53px] items-center gap-4 border-b border-border bg-bg/65 px-3 backdrop-blur">
+      <header className="sticky top-0 z-20 flex h-[53px] items-center gap-4 border-b border-border bg-bg px-3">
         <BackButton />
         <div className="min-w-0">
           <h1 className="text-[20px] font-bold leading-6">Postingan</h1>
@@ -237,7 +237,7 @@ export default async function PostPage({ params }: PageProps) {
             </div>
 
             {isOwner && analytics && (
-              <section className="mt-3 rounded-2xl border border-border bg-bg-elev p-3">
+              <section className="mt-3 rounded-xl border border-border bg-bg-elev p-3">
                 <div className="flex items-center justify-between gap-2">
                   <h2 className="text-[15px] font-semibold">
                     Analitik postingan
@@ -249,7 +249,7 @@ export default async function PostPage({ params }: PageProps) {
                     Dashboard
                   </Link>
                 </div>
-                <div className="mt-2 grid grid-cols-5 gap-1 text-center">
+                <div className="mt-2 grid grid-cols-3 gap-1 text-center sm:grid-cols-5">
                   {[
                     { label: "Tayangan", value: analytics.views },
                     { label: "Suka", value: analytics.likes },
@@ -335,7 +335,7 @@ export default async function PostPage({ params }: PageProps) {
         replies.map((reply) => <PostCard key={reply.id} post={reply} />)
       ) : (
         <p className="px-4 py-10 text-center text-[15px] text-text-muted">
-          Belum ada balasan. Jadilah yang pertama.
+          Belum ada balasan. Tulis balasan di atas untuk memulai diskusi.
         </p>
       )}
     </>

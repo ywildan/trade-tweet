@@ -22,6 +22,7 @@ export function LogoutButton() {
     <Button
       type="button"
       variant="danger"
+      className="min-h-11"
       onClick={logout}
       disabled={pending}
     >

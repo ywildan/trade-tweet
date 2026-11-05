@@ -31,14 +31,14 @@ export function FollowButton({
 
   const sizeClass =
     size === "sm"
-      ? "h-8 px-3 text-[13px]"
-      : "h-9 px-4 text-[14px]";
+      ? "min-h-11 h-11 px-3 text-[13px]"
+      : "min-h-11 h-11 px-4 text-[14px]";
 
   if (isGuest) {
     return (
       <Link
         href={`/login?next=${encodeURIComponent(`/@${username}`)}`}
-        className={`inline-flex shrink-0 items-center justify-center rounded-2xl bg-text font-semibold text-bg transition-colors hover:bg-text/90 ${sizeClass}`}
+        className={`inline-flex shrink-0 items-center justify-center rounded-lg bg-text font-semibold text-bg transition-colors hover:bg-text/90 ${sizeClass}`}
       >
         Ikuti
       </Link>
@@ -84,8 +84,7 @@ export function FollowButton({
       onBlur={() => setHover(false)}
       disabled={busy}
       aria-pressed={following}
-      aria-label={label}
-      className={`inline-flex shrink-0 items-center justify-center rounded-2xl border font-semibold transition-colors disabled:opacity-70 ${sizeClass} ${
+      className={`inline-flex shrink-0 items-center justify-center rounded-lg border font-semibold transition-colors disabled:opacity-70 ${sizeClass} ${
         following
           ? hover
             ? "border-short bg-short/10 text-short"

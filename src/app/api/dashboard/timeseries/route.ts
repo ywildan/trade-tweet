@@ -3,7 +3,7 @@ import { auth } from "@/auth";
 import { apiError, apiOk, handleApiError } from "@/lib/api";
 import { getDashboardTimeseries } from "@/lib/dashboard";
 
-/** GET /api/dashboard/timeseries — views & interaksi per hari (30 hari). */
+/** GET /api/dashboard/timeseries: views & interaksi per hari (30 hari). */
 export async function GET() {
   await connection();
 

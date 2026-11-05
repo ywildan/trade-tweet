@@ -9,7 +9,7 @@ import { ComposeBox } from "@/components/post/compose-box";
 
 type LauncherUser = { name: string; avatarUrl: string | null };
 
-/** Modal compose kecil di feed + FAB mobile (spesifikasi.md §4 Phase 2). */
+/** Modal compose kecil di feed + FAB mobile. */
 export function ComposeLauncher({
   user,
   variant = "prompt",
@@ -22,7 +22,7 @@ export function ComposeLauncher({
   const pathname = usePathname();
   const draftRef = useRef(false);
 
-  // DESIGN.md §9: konfirmasi "Buang postingan?" bila ada draf belum terkirim.
+  // Tanya dulu bila ada draf yang belum terkirim.
   const requestClose = useCallback(() => {
     if (
       draftRef.current &&
@@ -63,7 +63,7 @@ export function ComposeLauncher({
           type="button"
           onClick={() => setOpen(true)}
           aria-label="Buat postingan"
-          className="fixed bottom-20 right-4 z-30 flex h-14 w-14 items-center justify-center rounded-full bg-accent text-white shadow-lg transition-colors hover:bg-accent-hover lg:hidden"
+          className="fixed bottom-20 right-4 z-30 flex h-14 w-14 items-center justify-center rounded-lg bg-accent text-on-accent shadow-lg transition-colors hover:bg-accent-hover lg:hidden"
         >
           <PenLine size={23} />
         </button>
@@ -83,7 +83,7 @@ export function ComposeLauncher({
         <span className="flex-1 truncate text-[19px] text-text-muted">
           Ada setup apa hari ini?
         </span>
-        <span className="rounded-full bg-accent px-4 py-1.5 text-[15px] font-semibold text-white">
+        <span className="rounded-lg border border-accent bg-accent/15 px-4 py-1.5 text-[15px] font-semibold text-accent">
           Posting
         </span>
       </button>
@@ -115,14 +115,14 @@ function ComposeModal({
         role="dialog"
         aria-modal="true"
         aria-label="Buat postingan"
-        className="w-full max-w-[600px] overflow-hidden rounded-2xl border border-border bg-bg shadow-2xl"
+        className="w-full max-w-[600px] overflow-hidden rounded-xl border border-border bg-bg shadow-2xl"
       >
         <div className="flex h-[53px] items-center justify-between border-b border-border px-3">
           <button
             type="button"
             onClick={onClose}
             aria-label="Tutup"
-            className="rounded-full p-2 transition-colors hover:bg-text/10"
+            className="flex min-h-11 min-w-11 items-center justify-center rounded-lg p-2 transition-colors hover:bg-text/10"
           >
             <X size={20} />
           </button>

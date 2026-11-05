@@ -34,6 +34,8 @@ export function AdminBadgeList({ users }: { users: AdminUser[] }) {
 
   async function toggle(user: AdminUser, type: ManualBadge, grant: boolean) {
     const key = `${user.username}:${type}`;
+    const badgeLabel =
+      BADGES.find((badge) => badge.type === type)?.label ?? type;
     setPending(key);
     try {
       const response = await fetch(
@@ -56,8 +58,8 @@ export function AdminBadgeList({ users }: { users: AdminUser[] }) {
       }
       toast({
         message: grant
-          ? `Badge ${type} diberikan ke @${user.username}`
-          : `Badge ${type} dicabut dari @${user.username}`,
+          ? `Badge ${badgeLabel} diberikan ke @${user.username}`
+          : `Badge ${badgeLabel} dicabut dari @${user.username}`,
       });
       router.refresh();
     } catch (error) {
@@ -106,7 +108,7 @@ export function AdminBadgeList({ users }: { users: AdminUser[] }) {
                   type="button"
                   disabled={busy}
                   onClick={() => toggle(user, badge.type, !has)}
-                  className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-[13px] font-semibold transition-colors disabled:opacity-50 ${
+                  className={`inline-flex min-h-11 items-center gap-1.5 rounded-lg border px-3 py-1.5 text-[13px] font-semibold transition-colors disabled:opacity-50 ${
                     has
                       ? "border-short/40 text-short hover:bg-short/10"
                       : "border-border text-text hover:bg-text/10"

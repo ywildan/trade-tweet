@@ -3,7 +3,7 @@ import { auth } from "@/auth";
 import { apiError, apiOk, handleApiError } from "@/lib/api";
 import { getDashboardSummary } from "@/lib/dashboard";
 
-/** GET /api/dashboard/summary — ringkasan 30 hari milik pengguna login. */
+/** GET /api/dashboard/summary: ringkasan 30 hari milik pengguna login. */
 export async function GET() {
   await connection();
 

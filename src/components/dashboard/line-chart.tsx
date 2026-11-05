@@ -20,7 +20,7 @@ function formatDayLabel(day: string): string {
   }).format(new Date(`${day}T00:00:00.000Z`));
 }
 
-/** Line chart satu seri per kartu (views & engagement terpisah, DESIGN.md §3). */
+/** Line chart satu seri per kartu, tayangan dan interaksi terpisah. */
 export function LineChart({
   values,
   labels,
@@ -80,7 +80,7 @@ export function LineChart({
                 x={PAD.left - 6}
                 y={y + 3}
                 textAnchor="end"
-                className="fill-text-muted text-[10px]"
+                className="fill-text text-[10px]"
               >
                 {formatValue(max * ratio)}
               </text>
@@ -123,7 +123,7 @@ export function LineChart({
                     ? "end"
                     : "middle"
               }
-              className="fill-text-muted text-[10px]"
+              className="fill-text text-[10px]"
             >
               {formatDayLabel(labels[index])}
             </text>

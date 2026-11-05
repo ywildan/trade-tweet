@@ -17,7 +17,7 @@ type ToastItem = ToastInput & { id: number };
 
 const ToastContext = createContext<(input: ToastInput) => void>(() => {});
 
-/** toast() global — pojok kanan-bawah, auto-dismiss 3,5 detik (DESIGN.md §9). */
+/* toast() global: pojok kanan-bawah, auto-dismiss 3,5 detik. */
 export function ToastProvider({ children }: { children: React.ReactNode }) {
   const [toasts, setToasts] = useState<ToastItem[]>([]);
   const nextId = useRef(1);
@@ -56,7 +56,7 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
           <div
             key={toast.id}
             role="status"
-            className="pointer-events-auto flex items-start gap-3 rounded-xl border border-border bg-bg-elev px-4 py-3 text-[14px] text-text shadow-2xl"
+            className="pointer-events-auto flex items-start gap-3 rounded-xl border border-border bg-bg-elev px-4 py-3 text-[14px] text-text shadow-lg"
           >
             <span className="flex-1">{toast.message}</span>
             {toast.action && (
@@ -72,7 +72,7 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
               type="button"
               onClick={() => dismiss(toast.id)}
               aria-label="Tutup notifikasi"
-              className="-mr-1 -mt-0.5 rounded-full p-1 text-text-muted transition-colors hover:bg-text/10 hover:text-text"
+              className="-mr-2 -mt-2 flex h-11 w-11 shrink-0 items-center justify-center rounded-lg text-text-muted transition-colors hover:bg-text/10 hover:text-text"
             >
               <X size={15} />
             </button>

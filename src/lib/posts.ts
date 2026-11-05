@@ -173,7 +173,7 @@ export type FeedTab = "foryou" | "following";
 const FEED_LIMIT = 20;
 
 /**
- * Untuk Kamu — skor deterministik spesifikasi.md §6:
+ * Untuk Kamu: skor deterministik spesifikasi.md §6:
  * recency*1 + follow*2 + engagement*0.5 + signalQuality*1.5
  */
 export async function getFeed({

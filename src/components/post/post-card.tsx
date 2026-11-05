@@ -14,7 +14,6 @@ import { findSymbolEntry } from "@/lib/symbols";
 import type { FeedPost } from "@/types/post";
 
 /**
- * PostCard — anatomi feed X.com (DESIGN.md §5.1).
  * Klik area kosong membuka detail; tautan di dalamnya tidak ikut navigasi.
  */
 export function PostCard({
@@ -33,21 +32,16 @@ export function PostCard({
     router.push(href);
   }
 
-  // Artikel bukan lagi role="link": role itu membungkus tautan/tombol di
-  // dalamnya (tidak valid) dan merusak klik-tengah/buka-tab-baru. Akses
-  // keyboard ke detail tetap ada lewat tautan waktu di bawah, klik mouse
-  // di area kosong tetap membuka detail lewat openPost.
-  //
-  // Desktop: postingan sinyal tampil sebagai kartu ber-border (bukan baris
-  // flat ala X) supaya sinyal — konten utama Neuraly — menonjol dari
-  // teks biasa. Postingan teks biasa tetap flat. Mobile tidak berubah.
+  // Artikel bukan role link: role itu membungkus tautan di dalamnya dan
+  // merusak buka-tab-baru. Akses keyboard tetap lewat tautan waktu.
+  // Sinyal tampil sebagai kartu ber-border supaya menonjol dari teks biasa.
   const isSignalPost = hasSignalShape(post);
   return (
     <article
       onClick={openPost}
-      className={`group relative cursor-pointer border-b border-border p-4 transition-colors duration-150 hover:bg-text/[0.03] focus-visible:bg-text/[0.03] focus-visible:outline-none ${
+      className={`group relative cursor-pointer border-b border-border p-4 transition-colors duration-150 hover:bg-text/[0.03] ${
         isSignalPost
-          ? "lg:mx-3 lg:my-3 lg:rounded-2xl lg:border lg:border-border lg:bg-bg-elev/40"
+          ? "lg:mx-3 lg:my-3 lg:rounded-xl lg:border lg:border-border lg:bg-bg-elev/40"
           : ""
       }`}
     >
@@ -136,7 +130,7 @@ export function QuoteCard({ quote }: { quote: NonNullable<FeedPost["quote"]> }) 
     <Link
       href={`/post/${quote.id}`}
       onClick={(event) => event.stopPropagation()}
-      className="mt-2 block rounded-2xl border border-border p-3 transition-colors hover:border-text-muted"
+      className="mt-2 block rounded-xl border border-border p-3 transition-colors hover:border-text-muted"
     >
       <span className="flex items-center gap-1.5 text-[13px]">
         <Avatar name={quote.author.name} src={quote.author.avatarUrl} size={20} />
@@ -203,8 +197,7 @@ export function RichContent({
         );
       } else if (token.startsWith("$")) {
         const symbol = token.slice(1).toUpperCase();
-        // Hanya simbol katalog yang ditautkan: $BTC (bukan BTCUSDT) tetap
-        // teks, bukan tautan mati ke halaman 404.
+        // Hanya simbol katalog yang ditautkan; $BTC tanpa pasangan tetap teks.
         if (findSymbolEntry(symbol)) {
           result.push(
             <Link

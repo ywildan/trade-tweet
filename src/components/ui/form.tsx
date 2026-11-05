@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 
 export const inputClass =
-  "w-full rounded-lg border border-border bg-bg-input px-3 py-2.5 text-[15px] text-text placeholder:text-text-muted outline-none transition-colors focus:border-accent";
+  "w-full rounded-lg border border-border-strong bg-bg-input px-3 py-2.5 text-[15px] text-text placeholder:text-text-muted transition-colors focus:border-accent";
 
 export const textareaClass = `${inputClass} min-h-[96px] resize-y leading-5`;
 

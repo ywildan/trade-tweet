@@ -40,8 +40,8 @@ export default async function SearchPage({ searchParams }: PageProps) {
 
   return (
     <>
-      <header className="sticky top-0 z-20 border-b border-border bg-bg/65 backdrop-blur">
-        <div className="flex h-[53px] items-center gap-3 px-3">
+      <header className="sticky top-0 z-20 border-b border-border bg-bg">
+        <div className="flex min-h-[53px] items-center gap-3 px-3 py-2">
           <BackButton />
           <div className="min-w-0 flex-1">
             <SearchForm defaultValue={query} autoFocus tab={tab} />
@@ -51,7 +51,7 @@ export default async function SearchPage({ searchParams }: PageProps) {
 
       <nav
         aria-label="Tab pencarian"
-        className="sticky top-[53px] z-10 flex border-b border-border bg-bg/85 backdrop-blur"
+        className="sticky top-[53px] z-10 flex border-b border-border bg-bg"
       >
         {(
           [
@@ -96,7 +96,7 @@ export default async function SearchPage({ searchParams }: PageProps) {
           cta={
             <Link
               href="/"
-              className="rounded-2xl bg-accent px-4 py-2 text-[15px] font-semibold text-white"
+              className="inline-flex min-h-11 items-center justify-center rounded-lg bg-text px-4 py-2 text-[15px] font-semibold text-bg transition-colors hover:bg-text/90"
             >
               Kembali ke feed
             </Link>
@@ -187,7 +187,7 @@ function SymbolChip({ entry }: { entry: SymbolEntry }) {
   return (
     <Link
       href={`/symbol/${entry.symbol}`}
-      className="rounded-full border border-border bg-bg-elev px-3 py-1.5 text-[13px] transition-colors hover:border-text-muted"
+      className="inline-flex min-h-11 items-center rounded-full border border-border bg-bg-elev px-3 py-1.5 text-[13px] transition-colors hover:border-text-muted"
     >
       <b className="font-semibold">${entry.symbol}</b>
       <span className="ml-1 text-text-muted">{entry.market}</span>

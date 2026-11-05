@@ -19,8 +19,7 @@ import type { FeedPost } from "@/types/post";
 type InteractionKind = "like" | "repost" | "bookmark";
 
 /**
- * Engagement bar interaktif (DESIGN.md §5.1 & §9).
- * Semua toggle optimistis; gagal → rollback + toast.
+ * Semua toggle optimistis; gagal, state kembali dan muncul toast.
  */
 export function PostActions({
   post,
@@ -49,7 +48,7 @@ export function PostActions({
   const [menuOpen, setMenuOpen] = useState(false);
   const [busy, setBusy] = useState<InteractionKind | null>(null);
 
-  // Prop dari server berubah (refresh) → samakan state lokal saat render.
+  // Samakan state lokal saat prop server berubah.
   const signature = [
     post.id,
     post.viewer?.liked,
@@ -215,7 +214,7 @@ export function PostActions({
         onClick={(event) => event.stopPropagation()}
         aria-label={`Balas, ${post.counts.replies} balasan`}
         title="Balas"
-        className="inline-flex items-center gap-1 rounded-full p-1.5 text-[13px] transition-colors hover:bg-accent/10 hover:text-accent"
+        className="inline-flex min-h-11 min-w-11 items-center justify-center gap-1 rounded-lg p-1.5 text-[13px] transition-colors hover:bg-accent/10 hover:text-accent"
       >
         <MessageCircle size={18} strokeWidth={1.8} />
         {post.counts.replies > 0 && (
@@ -237,7 +236,7 @@ export function PostActions({
           aria-pressed={reposted}
           aria-label={reposted ? "Batalkan repost" : "Repost"}
           title="Repost"
-          className={`inline-flex items-center gap-1 rounded-full p-1.5 text-[13px] transition-colors hover:bg-repost/10 hover:text-repost ${
+          className={`inline-flex min-h-11 min-w-11 items-center justify-center gap-1 rounded-lg p-1.5 text-[13px] transition-colors hover:bg-repost/10 hover:text-repost ${
             reposted ? "text-repost" : ""
           }`}
         >
@@ -262,7 +261,7 @@ export function PostActions({
               role="menuitem"
               onClick={toggleRepost}
               disabled={busy === "repost"}
-              className="flex w-full items-center gap-3 px-4 py-2.5 text-left text-[14px] transition-colors hover:bg-text/10 disabled:opacity-60"
+              className="flex min-h-11 w-full items-center gap-3 px-4 py-2.5 text-left text-[14px] transition-colors hover:bg-text/10 disabled:opacity-60"
             >
               <Repeat2 size={17} />
               {reposted ? "Batalkan repost" : "Repost"}
@@ -271,7 +270,7 @@ export function PostActions({
               type="button"
               role="menuitem"
               onClick={quotePost}
-              className="flex w-full items-center gap-3 px-4 py-2.5 text-left text-[14px] transition-colors hover:bg-text/10"
+              className="flex min-h-11 w-full items-center gap-3 px-4 py-2.5 text-left text-[14px] transition-colors hover:bg-text/10"
             >
               <MessageCircle size={17} />
               Kutip postingan
@@ -290,7 +289,7 @@ export function PostActions({
         aria-pressed={liked}
         aria-label={liked ? "Batalkan suka" : "Suka"}
         title={liked ? "Batalkan suka" : "Suka"}
-        className={`inline-flex items-center gap-1 rounded-full p-1.5 text-[13px] transition-colors hover:bg-like/10 hover:text-like ${
+        className={`inline-flex min-h-11 min-w-11 items-center justify-center gap-1 rounded-lg p-1.5 text-[13px] transition-colors hover:bg-like/10 hover:text-like ${
           liked ? "text-like" : ""
         }`}
       >
@@ -313,7 +312,7 @@ export function PostActions({
         aria-pressed={bookmarked}
         aria-label={bookmarked ? "Hapus dari Simpanan" : "Simpan"}
         title={bookmarked ? "Hapus dari Simpanan" : "Simpan"}
-        className={`inline-flex items-center gap-1 rounded-full p-1.5 text-[13px] transition-colors hover:bg-save/10 hover:text-save ${
+        className={`inline-flex min-h-11 min-w-11 items-center justify-center gap-1 rounded-lg p-1.5 text-[13px] transition-colors hover:bg-save/10 hover:text-save ${
           bookmarked ? "text-save" : ""
         }`}
       >
@@ -345,7 +344,7 @@ export function PostActions({
                 ? "Hasil ini diperdebatkan, kartu tidak tersedia."
                 : "Kartu hasil tersedia untuk sinyal TP atau SL."
             }
-            className="inline-flex cursor-not-allowed items-center gap-1 rounded-full p-1.5 text-[13px] opacity-60"
+            className="inline-flex min-h-11 min-w-11 cursor-not-allowed items-center justify-center gap-1 rounded-lg p-1.5 text-[13px] opacity-60"
           >
             <Share size={18} strokeWidth={1.8} />
           </button>

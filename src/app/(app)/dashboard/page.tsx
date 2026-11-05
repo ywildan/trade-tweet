@@ -37,11 +37,11 @@ const STATUS_ORDER: Array<{
   label: string;
   tone: string;
 }> = [
-  { key: "OPEN", label: "Terbuka", tone: "bg-text-muted" },
+  { key: "OPEN", label: "Terbuka", tone: "bg-accent" },
   { key: "TP_HIT", label: "TP tercapai", tone: "bg-long" },
   { key: "SL_HIT", label: "SL tersentuh", tone: "bg-short" },
   { key: "EXPIRED", label: "Kedaluwarsa", tone: "bg-gold" },
-  { key: "CANCELLED", label: "Dibatalkan", tone: "bg-border" },
+  { key: "CANCELLED", label: "Dibatalkan", tone: "bg-text-muted" },
 ];
 
 export default async function DashboardPage() {
@@ -67,7 +67,7 @@ export default async function DashboardPage() {
 
   return (
     <>
-      <header className="sticky top-0 z-20 border-b border-border bg-bg/65 backdrop-blur">
+      <header className="sticky top-0 z-20 border-b border-border bg-bg">
         <div className="flex h-[53px] items-center justify-between gap-3 px-4">
           <div>
             <h1 className="text-[20px] font-bold leading-6">Analitik</h1>
@@ -84,17 +84,50 @@ export default async function DashboardPage() {
         </div>
       </header>
 
+      <section className="border-b border-border px-4 py-4 lg:px-6">
+        <h2 className="text-[20px] font-bold">Sinyal yang butuh perhatian</h2>
+        {summary.signals.statuses.OPEN > 0 ? (
+          <p className="mt-1 text-[15px] text-text-muted">
+            {summary.signals.statuses.OPEN} sinyal masih terbuka dari{" "}
+            {statusTotal} sinyal. {summary.signals.tpsHit} TP tercapai,{" "}
+            {summary.signals.slsHit} SL tersentuh,{" "}
+            {summary.signals.expired} kedaluwarsa. Periksa sinyal terbuka di
+            profilmu dan tutup yang sudah tidak berlaku.
+          </p>
+        ) : (
+          <p className="mt-1 text-[15px] text-text-muted">
+            Tidak ada sinyal terbuka. Semua {statusTotal} sinyal sudah selesai
+            atau dibatalkan.
+          </p>
+        )}
+        <Link
+          href={`/@${user.username}?tab=signals`}
+          className="mt-3 inline-flex min-h-11 items-center rounded-lg bg-text px-4 py-2 text-[15px] font-semibold text-bg transition-colors hover:bg-text/90"
+        >
+          Lihat sinyal di profil
+        </Link>
+      </section>
+
       <section className="grid gap-3 border-b border-border p-4 sm:grid-cols-2 lg:gap-4 lg:p-6">
         <StatTile
           label="Tayangan"
           value={formatCount(summary.views.total)}
-          delta={summary.views.delta ?? undefined}
+          delta={
+            summary.views.previous > 0
+              ? (summary.views.delta ?? undefined)
+              : undefined
+          }
+          hint="30 hari terakhir, dibanding 30 hari sebelumnya"
           spark={<Sparkline values={summary.views.series} />}
         />
         <StatTile
           label="Pengikut"
           value={formatCount(summary.followers.total)}
-          delta={summary.followers.delta ?? undefined}
+          delta={
+            summary.followers.previousPeriod > 0
+              ? (summary.followers.delta ?? undefined)
+              : undefined
+          }
           hint={`${formatNumber(summary.followers.newInPeriod)} pengikut baru dalam ${summary.periodDays} hari`}
           spark={
             <Sparkline
@@ -108,7 +141,7 @@ export default async function DashboardPage() {
           value={
             summary.views.total > 0
               ? formatPercent(summary.engagement.rate)
-              : "—"
+              : "Belum ada data"
           }
           hint={`${formatNumber(summary.engagement.total)} interaksi dari ${formatNumber(summary.views.total)} tayangan`}
         />
@@ -117,7 +150,7 @@ export default async function DashboardPage() {
           value={
             careerResolved > 0
               ? formatPercent(summary.signals.winRate * 100)
-              : "—"
+              : "Belum ada data"
           }
           hint={`${summary.signals.tpsHit} TP · ${summary.signals.slsHit} SL · ${summary.signals.expired} expired (semua waktu)`}
         />
@@ -127,7 +160,7 @@ export default async function DashboardPage() {
             value={
               summary.signals.avgRr != null
                 ? `1 : ${formatDecimal(summary.signals.avgRr)}`
-                : "—"
+                : "Belum ada data"
             }
             hint={
               summary.signals.rrSamples > 0
@@ -144,15 +177,15 @@ export default async function DashboardPage() {
           {statusTotal} sinyal · {statusResolved} sudah selesai
         </p>
 
-        <div className="mt-3 divide-y divide-border overflow-hidden rounded-2xl border border-border">
+        <div className="mt-3 divide-y divide-border overflow-hidden rounded-xl border border-border">
           {STATUS_ORDER.map((entry) => {
             const count = summary.signals.statuses[entry.key];
             const share = statusTotal > 0 ? (count / statusTotal) * 100 : 0;
             return (
               <div key={entry.key} className="flex items-center gap-3 px-4 py-2.5">
-                <span className={`h-2 w-2 shrink-0 rounded-full ${entry.tone}`} />
+                <span className={`h-2 w-2 shrink-0 rounded-full ${entry.tone}`} aria-hidden />
                 <span className="flex-1 text-[15px]">{entry.label}</span>
-                <span className="h-1.5 w-24 overflow-hidden rounded-full bg-bg-input">
+                <span className="h-1.5 w-24 overflow-hidden rounded-full bg-bg-input" aria-hidden>
                   <span
                     className={`block h-full rounded-full ${entry.tone}`}
                     style={{ width: `${share}%` }}
@@ -168,10 +201,12 @@ export default async function DashboardPage() {
       </section>
 
       <section className="border-b border-border px-4 py-4 lg:px-6">
-        <h2 className="text-[20px] font-bold">Grafik {summary.periodDays} hari</h2>
+        <h2 className="text-[20px] font-bold">
+          Tayangan dan interaksi per hari, {summary.periodDays} hari terakhir
+        </h2>
 
         <div className="mt-3 grid gap-3 lg:grid-cols-2">
-          <div className="min-w-0 rounded-2xl border border-border bg-bg-elev p-4">
+          <div className="min-w-0 rounded-xl border border-border bg-bg-elev p-4">
             <div className="flex items-baseline justify-between gap-3">
               <h3 className="text-[15px] font-semibold">Tayangan per hari</h3>
               <span className="text-[13px] text-text-muted">
@@ -186,7 +221,7 @@ export default async function DashboardPage() {
             />
           </div>
 
-          <div className="min-w-0 rounded-2xl border border-border bg-bg-elev p-4">
+          <div className="min-w-0 rounded-xl border border-border bg-bg-elev p-4">
             <div className="flex items-baseline justify-between gap-3">
               <h3 className="text-[15px] font-semibold">Interaksi per hari</h3>
               <span className="text-[13px] text-text-muted">
@@ -214,7 +249,7 @@ export default async function DashboardPage() {
         {summary.topPost ? (
           <Link
             href={`/post/${summary.topPost.id}`}
-            className="mt-3 block rounded-2xl border border-border bg-bg-elev p-4 transition-colors hover:border-text-muted"
+            className="mt-3 block rounded-xl border border-border bg-bg-elev p-4 transition-colors hover:border-text-muted"
           >
             <div className="flex items-center gap-2 text-[13px] text-text-muted">
               {summary.topPost.isSignal && summary.topPost.symbol && (
@@ -253,8 +288,9 @@ export default async function DashboardPage() {
             </div>
           </Link>
         ) : (
-          <p className="mt-3 rounded-2xl border border-border bg-bg-elev px-4 py-6 text-center text-[15px] text-text-muted">
-            Belum ada postingan untuk dianalisis.
+          <p className="mt-3 rounded-xl border border-border bg-bg-elev px-4 py-6 text-center text-[15px] text-text-muted">
+            Belum ada postingan untuk dianalisis. Tulis sinyal atau postingan
+            dulu, lalu kembali ke halaman ini.
           </p>
         )}
       </section>

@@ -30,7 +30,7 @@ async function authorize(username: string) {
   return { target };
 }
 
-/** POST /api/admin/users/[username]/badges — beri badge manual (admin). */
+/** POST /api/admin/users/[username]/badges: beri badge manual (admin). */
 export async function POST(request: Request, context: Context) {
   try {
     const { username } = await context.params;

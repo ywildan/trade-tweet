@@ -28,7 +28,7 @@ export default async function ComposePage({ searchParams }: PageProps) {
 
   return (
     <>
-      <header className="sticky top-0 z-20 flex h-[53px] items-center gap-4 border-b border-border bg-bg/65 px-3 backdrop-blur">
+      <header className="sticky top-0 z-20 flex h-[53px] items-center gap-4 border-b border-border bg-bg px-3">
         <BackButton />
         <h1 className="text-[20px] font-bold">
           {detail ? "Kutip postingan" : "Buat postingan"}
@@ -40,7 +40,7 @@ export default async function ComposePage({ searchParams }: PageProps) {
           role="alert"
           className="mx-4 mt-4 rounded-xl border border-short/40 bg-short/10 px-3 py-2 text-[13px] text-short"
         >
-          Postingan yang dikutip tidak ditemukan atau sudah dihapus — postingan
+          Postingan yang dikutip tidak ditemukan atau sudah dihapus. Postingan
           ini akan terkirim tanpa kutipan.
         </p>
       )}

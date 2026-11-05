@@ -10,23 +10,15 @@ export default function AuthLayout({
 }) {
   return (
     <div className="grid min-h-screen lg:grid-cols-2">
-      <aside className="relative hidden overflow-hidden border-r border-border bg-bg-elev/40 lg:flex lg:flex-col lg:justify-center lg:px-16">
-        <div
-          aria-hidden
-          className="pointer-events-none absolute inset-0"
-          style={{
-            background:
-              "radial-gradient(600px 400px at 20% 20%, rgba(29,155,240,0.12), transparent 60%), radial-gradient(500px 400px at 80% 80%, rgba(0,186,124,0.10), transparent 60%)",
-          }}
-        />
-        <div className="relative max-w-md">
+      <aside className="hidden border-r border-border bg-bg-elev lg:flex lg:flex-col lg:justify-center lg:px-16">
+        <div className="max-w-md">
           <Logo size={44} />
           <h2 className="mt-8 text-[38px] font-bold leading-[1.1]">
             Reputasi trader,
             <br />
             bukan sekadar klaim.
           </h2>
-          <p className="mt-3 text-[15px] text-text-muted">
+          <p className="mt-3 text-[15px] text-text">
             Setiap sinyal punya siklus hidup dan hasil yang tercatat. TP
             tercapai berarti bukti yang bisa dibagikan.
           </p>
@@ -55,7 +47,7 @@ export default function AuthLayout({
           <ThemeToggle />
         </div>
 
-        <div className="flex flex-1 items-center justify-center px-6 py-10">
+        <div className="flex flex-1 items-center justify-center px-6 pb-16 pt-10">
           <div className="w-full max-w-[400px]">{children}</div>
         </div>
 

@@ -3,8 +3,10 @@ import Link from "next/link";
 import {
   ArrowDown,
   ArrowUp,
+  Check,
   TrendingDown,
   TrendingUp,
+  X,
 } from "lucide-react";
 
 import { formatPrice, formatPnl } from "@/lib/format";
@@ -13,8 +15,7 @@ import type { MarketName } from "@/lib/symbols";
 import type { DirectionName, SignalStatusName } from "@/types/post";
 
 /**
- * SignalCard — panel sinyal di dalam PostCard (DESIGN.md §5.2).
- * Server-safe; dipakai feed, detail, dan styleguide.
+ * Panel sinyal di dalam PostCard. Server-safe; dipakai feed, detail, dan styleguide.
  */
 export function SignalCard({
   symbol,
@@ -39,26 +40,19 @@ export function SignalCard({
   market?: MarketName;
 }) {
   const isLong = direction === "LONG";
-  const isCancelled = status === "CANCELLED";
+  const isResolved = status === "TP_HIT" || status === "SL_HIT";
   const potentialPct = isLong
     ? ((takeProfit - entry) / entry) * 100
     : ((entry - takeProfit) / entry) * 100;
 
   const pnl = pnlPercent ?? potentialPct;
-  const pnlLabel = isCancelled
-    ? "Status"
-    : pnlPercent == null
-      ? "Potensi"
-      : "Hasil";
-  const pnlColor =
-    status === "SL_HIT" || pnl < 0 ? "text-short" : "text-long";
+  // Sinyal batal atau kedaluwarsa tanpa hasil tercatat tidak punya angka.
+  const noResult =
+    (status === "CANCELLED" || status === "EXPIRED") && pnlPercent == null;
+  const pnlLabel = pnlPercent == null && !noResult ? "Potensi" : "Hasil";
 
   return (
-    <div
-      className={`my-1.5 rounded-2xl border border-border bg-bg-elev p-3 lg:border-l-4 lg:p-4 ${
-        isLong ? "lg:border-l-long" : "lg:border-l-short"
-      }`}
-    >
+    <div className="my-1.5 rounded-xl border border-border bg-bg-elev p-3 lg:p-4">
       <div className="flex flex-wrap items-center gap-2">
         <Link
           href={`/symbol/${symbol}`}
@@ -68,15 +62,15 @@ export function SignalCard({
         </Link>
         <span
           className={`inline-flex items-center gap-1 rounded-full px-2.5 py-[2px] text-xs font-semibold ${
-            isLong ? "bg-long/15 text-long" : "bg-short/15 text-short"
+            isLong ? "bg-long/15" : "bg-short/15"
           }`}
         >
           {isLong ? (
-            <TrendingUp size={14} aria-hidden />
+            <TrendingUp size={14} aria-hidden className="text-long" />
           ) : (
-            <TrendingDown size={14} aria-hidden />
+            <TrendingDown size={14} aria-hidden className="text-short" />
           )}
-          {isLong ? "LONG" : "SHORT"}
+          <span className="text-text">{isLong ? "LONG" : "SHORT"}</span>
         </span>
         <span className="text-[13px] text-text-muted">
           · {timeframe.toUpperCase()}
@@ -89,8 +83,7 @@ export function SignalCard({
 
       <div className="mt-3 grid grid-cols-2 gap-x-2 gap-y-1.5 tabular lg:gap-x-4 lg:gap-y-2">
         <Cell label="Entry" value={formatPrice(entry)} />
-        {/* Panah mengikuti arah harga, bukan label: untuk SHORT, TP ada di
-            bawah entry dan SL di atas entry — sebelumnya terbalik. */}
+        {/* Panah mengikuti arah harga, bukan label: untuk SHORT, TP di bawah entry dan SL di atas entry. */}
         <Cell
           label="TP"
           value={formatPrice(takeProfit)}
@@ -115,10 +108,27 @@ export function SignalCard({
           }
           color="text-short"
         />
-        <div className="flex items-center gap-2">
+        <div
+          className={`flex items-center gap-2 ${
+            isResolved ? "col-span-2 border-t border-border pt-2" : ""
+          }`}
+        >
           <span className="text-[13px] text-text-muted">{pnlLabel}</span>
-          <span className={`ml-auto text-[15px] font-bold ${pnlColor}`}>
-            {isCancelled ? "—" : formatPnl(pnl)}
+          {isResolved && (
+            <span aria-hidden>
+              {status === "TP_HIT" ? (
+                <Check size={15} className="text-long" />
+              ) : (
+                <X size={15} className="text-short" />
+              )}
+            </span>
+          )}
+          <span
+            className={`ml-auto tabular font-bold ${
+              isResolved ? "text-[17px]" : "text-[15px]"
+            } text-text`}
+          >
+            {noResult ? "Tidak ada" : formatPnl(pnl)}
           </span>
         </div>
       </div>

@@ -10,7 +10,7 @@ import {
 
 import { useToast } from "@/components/ui/toast";
 
-/** Tombol bagikan hasil — unduh SVG, buka kartu, atau salin tautan post. */
+/** Tombol bagikan hasil: unduh SVG, buka kartu, atau salin tautan post. */
 export function ShareResultButton({
   postId,
   variant = "icon",
@@ -70,8 +70,8 @@ export function ShareResultButton({
         title="Bagikan Hasil"
         className={
           variant === "full"
-            ? "inline-flex items-center gap-2 rounded-full bg-accent px-4 py-2 text-[14px] font-semibold text-white transition-colors hover:bg-accent-hover"
-            : "inline-flex items-center gap-1 rounded-full p-1.5 text-[13px] transition-colors hover:bg-accent/10 hover:text-accent"
+            ? "inline-flex min-h-11 items-center gap-2 rounded-lg border border-accent bg-accent/15 px-4 py-2 text-[14px] font-semibold text-accent transition-colors hover:bg-accent/25"
+            : "inline-flex min-h-11 min-w-11 items-center justify-center gap-1 rounded-lg p-1.5 text-[13px] transition-colors hover:bg-accent/10 hover:text-accent"
         }
       >
         <Share size={variant === "full" ? 16 : 18} strokeWidth={1.8} />
@@ -92,7 +92,7 @@ export function ShareResultButton({
             href={`${cardUrl}?download=1`}
             download
             onClick={() => setOpen(false)}
-            className="flex items-center gap-3 px-4 py-2.5 text-[14px] transition-colors hover:bg-text/10"
+            className="flex min-h-11 items-center gap-3 px-4 py-2.5 text-[14px] transition-colors hover:bg-text/10"
           >
             <Download size={17} />
             Unduh kartu SVG
@@ -103,7 +103,7 @@ export function ShareResultButton({
             target="_blank"
             rel="noreferrer noopener"
             onClick={() => setOpen(false)}
-            className="flex items-center gap-3 px-4 py-2.5 text-[14px] transition-colors hover:bg-text/10"
+            className="flex min-h-11 items-center gap-3 px-4 py-2.5 text-[14px] transition-colors hover:bg-text/10"
           >
             <ExternalLink size={17} />
             Buka kartu
@@ -112,7 +112,7 @@ export function ShareResultButton({
             type="button"
             role="menuitem"
             onClick={copyLink}
-            className="flex w-full items-center gap-3 px-4 py-2.5 text-left text-[14px] transition-colors hover:bg-text/10"
+            className="flex min-h-11 w-full items-center gap-3 px-4 py-2.5 text-left text-[14px] transition-colors hover:bg-text/10"
           >
             <Link2 size={17} />
             Salin tautan postingan

@@ -6,20 +6,22 @@ import { formatPnl, formatPrice } from "@/lib/format";
 
 type Context = { params: Promise<{ postId: string }> };
 
-// Gambar OG harus mencerminkan status/PnL terbaru: tandai dinamis lewat
-// connection() (segment config `dynamic` tidak kompatibel dengan Cache
-// Components di Next 16 dan menggagalkan build).
+// Gambar OG mencerminkan status/PnL terbaru, jadi tandai dinamis lewat
+// connection(). Segment config `dynamic` tidak kompatibel dengan Cache
+// Components di Next 16 dan menggagalkan build.
 
-const BG = "#0b0f14";
+const BG = "#0f1419";
 const TEXT = "#e7e9ea";
-const MUTED = "#9ba3ad";
+const MUTED = "#9aa0a6";
+const DIVIDER = "#2f3336";
+const CHIP_TEXT = "#000000";
 const LONG = "#00ba7c";
 const SHORT = "#f4212e";
 const ACCENT = "#1d9bf0";
 
 /**
- * GET /api/og/[postId] — gambar OG 1200×630 (spesifikasi.md §4 Phase 6).
- * Memakai ImageResponse bawaan Next (satori/resvg), tanpa dependency tambahan.
+ * GET /api/og/[postId]: gambar OG 1200x630 (spesifikasi.md §4 Phase 6).
+ * ImageResponse bawaan Next (satori/resvg), tanpa dependensi tambahan.
  */
 async function getOg(_request: Request, context: Context) {
   await connection();
@@ -61,8 +63,21 @@ async function getOg(_request: Request, context: Context) {
 
   const isResolved =
     post.isSignal && (post.status === "TP_HIT" || post.status === "SL_HIT");
-  const tone =
-    post.status === "TP_HIT" ? LONG : post.status === "SL_HIT" ? SHORT : ACCENT;
+  // Arah diwarnai menurut arahnya sendiri, bukan menurut hasil: LONG
+  // selalu hijau, SHORT selalu merah.
+  const directionTone = post.direction === "SHORT" ? SHORT : LONG;
+  // Status selalu berlabel teks di atas latar solid, jadi terbaca tanpa
+  // mengandalkan warna. Kadaluwarsa/dibatalkan memakai abu supaya biru
+  // hanya untuk sinyal yang masih terbuka.
+  const statusBg =
+    post.status === "TP_HIT"
+      ? LONG
+      : post.status === "SL_HIT"
+        ? SHORT
+        : post.status === "OPEN"
+          ? ACCENT
+          : MUTED;
+  const pnlTone = post.status === "TP_HIT" ? LONG : SHORT;
   const statusLabel =
     post.status === "TP_HIT"
       ? "TP TERCAPAI"
@@ -114,13 +129,7 @@ async function getOg(_request: Request, context: Context) {
             </div>
             <div style={{ fontSize: "34px", fontWeight: 700 }}>Neuraly</div>
           </div>
-          <div
-            style={{
-              fontSize: "17px",
-              letterSpacing: "2px",
-              color: MUTED,
-            }}
-          >
+          <div style={{ fontSize: "17px", color: MUTED }}>
             {verified ? "TRADER TERVERIFIKASI" : "SINYAL NEURALY"}
           </div>
         </div>
@@ -131,18 +140,27 @@ async function getOg(_request: Request, context: Context) {
               <span style={{ fontSize: "68px", fontWeight: 700 }}>
                 {post.symbol ?? "SIGNAL"}
               </span>
-              <span style={{ fontSize: "44px", fontWeight: 700, color: tone }}>
+              <span
+                style={{
+                  fontSize: "44px",
+                  fontWeight: 700,
+                  color: directionTone,
+                }}
+              >
                 · {post.direction ?? "LONG"}
               </span>
             </div>
             <div
               style={{
                 display: "flex",
-                fontSize: "24px",
+                alignSelf: "flex-start",
+                backgroundColor: statusBg,
+                color: CHIP_TEXT,
+                fontSize: "20px",
                 fontWeight: 700,
-                letterSpacing: "3px",
-                color: tone,
-                marginTop: "10px",
+                padding: "10px 16px",
+                borderRadius: "8px",
+                marginTop: "18px",
               }}
             >
               {statusLabel}
@@ -150,16 +168,37 @@ async function getOg(_request: Request, context: Context) {
             </div>
             <div style={{ display: "flex", marginTop: "26px" }}>
               {isResolved && post.pnlPercent != null ? (
-                <span style={{ fontSize: "116px", fontWeight: 700, color: tone }}>
+                <span
+                  style={{
+                    fontSize: "116px",
+                    fontWeight: 700,
+                    color: pnlTone,
+                    fontVariantNumeric: "tabular-nums",
+                  }}
+                >
                   {formatPnl(post.pnlPercent)}
                 </span>
               ) : (
-                <span style={{ fontSize: "58px", fontWeight: 700, color: TEXT }}>
+                <span
+                  style={{
+                    fontSize: "58px",
+                    fontWeight: 700,
+                    color: TEXT,
+                    fontVariantNumeric: "tabular-nums",
+                  }}
+                >
                   Entry {formatPrice(post.entry ?? 0)}
                 </span>
               )}
             </div>
-            <div style={{ display: "flex", fontSize: "26px", color: MUTED }}>
+            <div
+              style={{
+                display: "flex",
+                fontSize: "26px",
+                color: MUTED,
+                fontVariantNumeric: "tabular-nums",
+              }}
+            >
               TP {formatPrice(post.takeProfit ?? 0)} · SL{" "}
               {formatPrice(post.stopLoss ?? 0)}
             </div>
@@ -189,10 +228,11 @@ async function getOg(_request: Request, context: Context) {
             display: "flex",
             alignItems: "center",
             justifyContent: "space-between",
-            borderTop: "1px solid rgba(255,255,255,0.12)",
+            borderTop: `1px solid ${DIVIDER}`,
             paddingTop: "22px",
             fontSize: "22px",
             color: MUTED,
+            fontVariantNumeric: "tabular-nums",
           }}
         >
           <span style={{ color: TEXT, fontWeight: 600 }}>

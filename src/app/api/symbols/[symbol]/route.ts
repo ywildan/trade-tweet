@@ -5,7 +5,7 @@ import { inferMarket } from "@/lib/symbols";
 
 type Context = { params: Promise<{ symbol: string }> };
 
-/** GET /api/symbols/[symbol] — harga terakhir untuk polling 30 detik. */
+/** GET /api/symbols/[symbol]: harga terakhir untuk polling 30 detik. */
 export async function GET(_request: Request, context: Context) {
   await connection();
 

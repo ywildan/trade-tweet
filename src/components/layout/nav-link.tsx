@@ -27,6 +27,8 @@ export type NavIconName =
   | "settings"
   | "search";
 
+// Ikon dipilih karena relevan dengan isinya: rumah untuk Utama, lonceng
+// untuk Notifikasi, penanda untuk Simpanan, kolom grafik untuk Analitik.
 const ICONS: Record<NavIconName, LucideIcon> = {
   home: Home,
   user: UserRound,
@@ -44,6 +46,10 @@ function useActive(href: string, exact: boolean) {
   return exact
     ? pathname === href
     : pathname === href || pathname.startsWith(`${href}/`);
+}
+
+function accessibleLabel(label: string, badge: number) {
+  return badge > 0 ? `${label}, ${badge} belum dibaca` : label;
 }
 
 export function NavLink({
@@ -64,13 +70,12 @@ export function NavLink({
   return (
     <Link
       href={href}
-      title={label}
-      aria-label={label}
+      aria-label={accessibleLabel(label, badge)}
       aria-current={active ? "page" : undefined}
-      className="flex w-fit items-center justify-center gap-4 rounded-full px-3 py-3 text-text transition-colors hover:bg-text/10 lg:w-full lg:justify-start"
+      className="flex w-fit items-center justify-center gap-4 rounded-lg px-3 py-3 text-text transition-colors hover:bg-text/10 lg:w-full lg:justify-start"
     >
       <span className="relative inline-flex">
-        <Icon size={26} strokeWidth={active ? 2.2 : 1.8} />
+        <Icon size={26} strokeWidth={active ? 2.2 : 1.8} aria-hidden />
         <CountBadge count={badge} />
       </span>
       <span
@@ -102,13 +107,14 @@ export function MobileNavLink({
   return (
     <Link
       href={href}
+      aria-label={accessibleLabel(label, badge)}
       aria-current={active ? "page" : undefined}
-      className={`flex flex-1 flex-col items-center gap-0.5 py-2 text-[11px] ${
+      className={`flex min-h-[56px] flex-1 flex-col items-center justify-center gap-0.5 px-1 py-2 text-[11px] transition-colors hover:bg-text/10 active:bg-text/10 ${
         active ? "font-bold text-text" : "text-text-muted"
       }`}
     >
       <span className="relative inline-flex">
-        <Icon size={24} strokeWidth={active ? 2.2 : 1.8} />
+        <Icon size={24} strokeWidth={active ? 2.2 : 1.8} aria-hidden />
         <CountBadge count={badge} />
       </span>
       {label}
@@ -119,7 +125,7 @@ export function MobileNavLink({
 function CountBadge({ count }: { count: number }) {
   if (count <= 0) return null;
   return (
-    <span className="absolute -right-2 -top-1.5 min-w-[18px] rounded-full bg-accent px-1 text-center text-[10px] font-bold leading-[18px] text-white tabular">
+    <span className="absolute -right-2 -top-1.5 min-w-[18px] rounded-full bg-accent px-1 text-center text-[10px] font-bold leading-[18px] text-on-accent tabular">
       {count > 99 ? "99+" : formatCount(count)}
     </span>
   );

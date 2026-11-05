@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import { TrendingDown, TrendingUp } from "lucide-react";
 
-/** StatTile — kartu statistik dashboard (DESIGN.md §5.5). Server-safe. */
+/** Kartu statistik dashboard. */
 export function StatTile({
   label,
   value,
@@ -11,14 +11,14 @@ export function StatTile({
 }: {
   label: string;
   value: string;
-  /** Persen perubahan vs periode sebelumnya; deltaChip hijau bila positif. */
+  /** Persen perubahan vs 30 hari sebelumnya. */
   delta?: number;
   /** Keterangan kecil di bawah angka (mis. definisi metrik). */
   hint?: string;
   spark?: ReactNode;
 }) {
   return (
-    <div className="rounded-2xl bg-bg-elev p-4 border border-border">
+    <div className="rounded-xl bg-bg-elev p-4 border border-border">
       <div className="flex items-start justify-between gap-2">
         <div>
           <div className="text-[13px] text-text-muted">{label}</div>
@@ -26,18 +26,18 @@ export function StatTile({
             {value}
           </div>
           {delta != null && (
-            <div
-              className={`mt-1 flex items-center gap-1 text-[13px] font-semibold ${
-                delta >= 0 ? "text-long" : "text-short"
-              }`}
-            >
+            <div className="mt-1 flex items-center gap-1 text-[13px]">
               {delta >= 0 ? (
-                <TrendingUp size={14} aria-hidden />
+                <TrendingUp size={14} aria-hidden className="text-long" />
               ) : (
-                <TrendingDown size={14} aria-hidden />
+                <TrendingDown size={14} aria-hidden className="text-short" />
               )}{" "}
-              {Math.abs(delta).toLocaleString("id-ID")}%{" "}
-              <span className="text-text-muted font-normal">30 hari</span>
+              <span className="font-semibold text-text tabular">
+                {Math.abs(delta).toLocaleString("id-ID")}%
+              </span>{" "}
+              <span className="text-text-muted font-normal">
+                vs 30 hari lalu
+              </span>
             </div>
           )}
           {hint && (
@@ -50,7 +50,7 @@ export function StatTile({
   );
 }
 
-/** EmptyState — list kosong (DESIGN.md §4). */
+/** State kosong untuk list. */
 export function EmptyState({
   title,
   subtitle,
@@ -61,7 +61,10 @@ export function EmptyState({
   cta?: ReactNode;
 }) {
   return (
-    <div className="flex flex-col items-center gap-2 py-16 px-6 text-center">
+    <div
+      role="status"
+      className="flex flex-col items-center gap-2 py-16 px-6 text-center"
+    >
       <div className="text-[20px] font-bold text-text">{title}</div>
       {subtitle && <div className="text-[15px] text-text-muted">{subtitle}</div>}
       {cta && <div className="mt-3">{cta}</div>}

@@ -213,7 +213,7 @@ export const postSchema = z
         });
       }
       // Simbol di luar katalog tidak bisa di-resolve otomatis (feed menolak)
-      // dan akan terjebak OPEN selamanya — tolak sejak compose.
+      // dan akan terjebak OPEN selamanya: tolak sejak compose.
       if (data.market === "CRYPTO") {
         const entry = findSymbolEntry(data.symbol);
         if (!entry || entry.market !== "CRYPTO") {

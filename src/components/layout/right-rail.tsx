@@ -35,11 +35,9 @@ export async function RightRail() {
     _count: { select: { followers: true } },
   } as const;
 
-  // Urutkan di database, bukan 12 user pertama yang urutannya acak:
-  // "teratas" sebelumnya tidak pernah menampilkan trader terbaik di luar
-  // 12 pertama, dan "untuk diikuti" membuang slot untuk akun yang sudah
-  // diikuti. Judul lama "Trader minggu ini" juga menyesatkan karena
-  // datanya win-rate lifetime, bukan mingguan — diganti "Trader teratas".
+  // Urutkan di database, bukan 12 user pertama yang urutannya acak.
+  // Judul lama "Trader minggu ini" menyesatkan karena datanya win-rate
+  // lifetime, bukan mingguan.
   const [topTraders, suggested] = await Promise.all([
     prisma.user.findMany({
       where: {
@@ -67,17 +65,16 @@ export async function RightRail() {
     <div className="space-y-4 py-2">
       <SearchForm />
 
-      {/* Panel trading: sorotan satu sinyal teratas hari ini, dari data
-          trending yang sama — bukan query baru, bukan duplikat daftar
-          "Simbol trending" di bawahnya. */}
+      {/* Sorotan satu sinyal teratas dari data trending yang sama, bukan
+          query baru dan bukan duplikat daftar "Simbol trending". */}
       {topSignal && (
         <RailCard
-          icon={<Target size={18} className="text-long" />}
-          title="Sinyal top hari ini"
+          icon={<Target size={18} className="text-long" aria-hidden />}
+          title="Sinyal teratas minggu ini"
         >
           <Link
             href={`/symbol/${topSignal.symbol}`}
-            className="block rounded-xl border-l-2 border-long bg-bg px-3 py-2.5 transition-colors hover:bg-text/[0.03]"
+            className="block rounded-xl border-l-2 border-long px-3 py-2.5 transition-colors hover:bg-text/[0.03]"
           >
             <span className="block text-[19px] font-bold leading-6">
               ${topSignal.symbol}
@@ -97,7 +94,8 @@ export async function RightRail() {
       )}
 
       <RailCard
-        icon={<Flame size={18} className="text-short" />}
+        variant="plain"
+        icon={<Flame size={18} className="text-short" aria-hidden />}
         title="Simbol trending"
       >
         {trending.length === 0 ? (
@@ -131,7 +129,7 @@ export async function RightRail() {
       </RailCard>
 
       <RailCard
-        icon={<Trophy size={18} className="text-gold" />}
+        icon={<Trophy size={18} className="text-gold" aria-hidden />}
         title="Trader teratas"
       >
         {topTraders.length === 0 ? (
@@ -157,7 +155,8 @@ export async function RightRail() {
       </RailCard>
 
       <RailCard
-        icon={<TrendingUp size={18} className="text-repost" />}
+        variant="plain"
+        icon={<TrendingUp size={18} className="text-repost" aria-hidden />}
         title="Siapa untuk diikuti"
       >
         {suggested.length === 0 ? (
@@ -199,17 +198,32 @@ export async function RightRail() {
   );
 }
 
+// Dua perlakuan mengikuti isi: "card" berbingkai untuk sorotan dan
+// peringkat, "plain" daftar terbuka untuk deret yang dibaca berurutan.
 function RailCard({
   icon,
   title,
+  variant = "card",
   children,
 }: {
   icon: React.ReactNode;
   title: string;
+  variant?: "card" | "plain";
   children: React.ReactNode;
 }) {
+  if (variant === "plain") {
+    return (
+      <section>
+        <h2 className="flex items-center gap-2 px-2 pt-2 text-[19px] font-bold">
+          {icon}
+          {title}
+        </h2>
+        <div className="px-2 py-2">{children}</div>
+      </section>
+    );
+  }
   return (
-    <section className="overflow-hidden rounded-2xl border border-border bg-bg-elev/60">
+    <section className="overflow-hidden rounded-xl border border-border bg-bg">
       <h2 className="flex items-center gap-2 px-4 pt-4 text-[19px] font-bold">
         {icon}
         {title}

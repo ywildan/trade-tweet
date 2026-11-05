@@ -7,7 +7,7 @@ import { postInclude, serializePost } from "@/lib/posts";
 import { enforceRateLimit } from "@/lib/rate-limit";
 import { postSchema } from "@/lib/validation";
 
-/** POST /api/posts — post biasa, sinyal, balasan, atau kutipan (spesifikasi.md §5). */
+/** POST /api/posts: post biasa, sinyal, balasan, atau kutipan (spesifikasi.md §5). */
 export async function POST(request: Request) {
   try {
     const session = await auth();

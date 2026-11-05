@@ -1,6 +1,6 @@
 export const DAY_MS = 86_400_000;
 
-/** Hari UTC "YYYY-MM-DD" — sama dengan format kolom PostView.day & DailyStat.day. */
+/** Hari UTC "YYYY-MM-DD": sama dengan format kolom PostView.day & DailyStat.day. */
 export function utcDay(date: Date = new Date()): string {
   return date.toISOString().slice(0, 10);
 }

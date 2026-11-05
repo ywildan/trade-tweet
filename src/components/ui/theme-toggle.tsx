@@ -2,11 +2,8 @@
 
 import { Moon, Sun } from "lucide-react";
 
-/**
- * ThemeToggle — switch terang/gelap (DESIGN.md §2.1 & §10).
- * Ikon dipilih lewat CSS berdasarkan data-theme di <html>, jadi tidak perlu
- * state React yang disinkronkan dari DOM saat mount.
- */
+/* ThemeToggle: switch terang/gelap. Ikon dipilih lewat CSS dari data-theme
+   di <html>, jadi tidak perlu state React yang disinkronkan saat mount. */
 export function ThemeToggle() {
   function toggle() {
     const root = document.documentElement;
@@ -24,7 +21,7 @@ export function ThemeToggle() {
       onClick={toggle}
       aria-label="Ganti tema terang atau gelap"
       title="Ganti tema"
-      className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-border text-text transition-colors duration-150 hover:bg-bg-input/60 cursor-pointer"
+      className="inline-flex h-11 w-11 items-center justify-center rounded-lg border border-border text-text transition-colors duration-150 hover:bg-bg-input/60"
       type="button"
     >
       <Sun size={18} strokeWidth={2} className="theme-icon-sun" />

@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { TriangleAlert } from "lucide-react";
 
 export default function AppError({
   reset,
@@ -9,22 +10,28 @@ export default function AppError({
   reset: () => void;
 }) {
   return (
-    <div className="p-4 text-center">
-      <h2 className="text-[19px] font-bold">Terjadi kesalahan</h2>
-      <p className="mt-1 text-[14px] text-text-muted">
-        Halaman ini gagal dimuat. Coba lagi, atau kembali ke beranda.
+    <div role="alert" className="p-4 text-center">
+      <TriangleAlert
+        size={28}
+        aria-hidden="true"
+        className="mx-auto text-short"
+      />
+      <h2 className="mt-3 text-[19px] font-bold">Halaman gagal dimuat</h2>
+      <p className="mx-auto mt-1 max-w-sm text-[14px] text-text-muted">
+        Terjadi kesalahan saat memuat halaman ini. Coba muat ulang, atau
+        kembali ke beranda dan buka lagi dari sana.
       </p>
-      <div className="mt-4 flex justify-center gap-2">
+      <div className="mt-4 flex flex-wrap justify-center gap-2">
         <button
           type="button"
           onClick={reset}
-          className="rounded-2xl bg-accent px-4 py-2 text-[14px] font-semibold text-white"
+          className="inline-flex min-h-11 cursor-pointer items-center justify-center rounded-lg bg-accent px-4 text-[14px] font-semibold text-on-accent transition-colors hover:bg-accent-hover"
         >
           Coba lagi
         </button>
         <Link
           href="/"
-          className="rounded-2xl border border-border px-4 py-2 text-[14px] font-semibold"
+          className="inline-flex min-h-11 items-center justify-center rounded-lg border border-border px-4 text-[14px] font-semibold transition-colors hover:bg-bg-input"
         >
           Ke beranda
         </Link>

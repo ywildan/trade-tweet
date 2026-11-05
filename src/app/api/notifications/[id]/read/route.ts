@@ -4,7 +4,7 @@ import { prisma } from "@/lib/db";
 
 type Context = { params: Promise<{ id: string }> };
 
-/** POST /api/notifications/[id]/read — tandai satu notifikasi dibaca. */
+/** POST /api/notifications/[id]/read: tandai satu notifikasi dibaca. */
 export async function POST(_request: Request, context: Context) {
   try {
     const { id } = await context.params;
@@ -19,7 +19,7 @@ export async function POST(_request: Request, context: Context) {
     });
     if (updated.count === 0) {
       // Bisa jadi sudah dibaca atau bukan milik pengguna: jangan bocorkan
-      // bedanya lewat 404 vs 200 yang berbeda pesan — cukup balas 404 umum.
+      // bedanya lewat 404 vs 200 yang berbeda pesan: cukup balas 404 umum.
       const exists = await prisma.notification.findFirst({
         where: { id, recipientId: session.user.id },
         select: { id: true },

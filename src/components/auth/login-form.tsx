@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import { AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Field, inputClass } from "@/components/ui/form";
 import { firstFieldErrors, loginSchema } from "@/lib/validation";
@@ -67,9 +68,10 @@ export function LoginForm() {
       {message && (
         <p
           role="alert"
-          className="rounded-lg border border-short/40 bg-short/10 px-3 py-2 text-[13px] text-short"
+          className="flex items-start gap-2 rounded-lg border border-short/40 bg-short/10 px-3 py-2 text-[13px] text-short"
         >
-          {message}
+          <AlertCircle size={16} aria-hidden="true" className="mt-0.5 shrink-0" />
+          <span>{message}</span>
         </p>
       )}
 
@@ -99,8 +101,8 @@ export function LoginForm() {
         />
       </Field>
 
-      <Button type="submit" className="w-full" disabled={pending}>
-        {pending ? "Masuk…" : "Masuk"}
+      <Button type="submit" className="min-h-11 w-full" disabled={pending}>
+        {pending ? "Sedang masuk…" : "Masuk ke Neuraly"}
       </Button>
     </form>
   );

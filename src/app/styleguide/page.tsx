@@ -14,6 +14,7 @@ import {
   Share,
   Trophy,
   Target,
+  ArrowLeft,
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -64,9 +65,9 @@ function Section({
   children: React.ReactNode;
 }) {
   return (
-    <section id={id} className="border-b border-border py-6 px-4 sm:px-6">
+    <section id={id} className="scroll-mt-28 border-b border-border px-4 py-6 sm:px-6">
       <h2 className="text-[20px] font-bold">{title}</h2>
-      {desc && <p className="text-[13px] text-text-muted mt-0.5">{desc}</p>}
+      {desc && <p className="mt-0.5 text-[13px] text-text-muted">{desc}</p>}
       <div className="mt-4">{children}</div>
     </section>
   );
@@ -74,19 +75,22 @@ function Section({
 
 export default function StyleguidePage() {
   return (
-    <div className="max-w-[700px] mx-auto border-x border-border min-h-screen">
-      {/* Header */}
-      <header className="sticky top-0 z-20 backdrop-blur bg-bg/65 border-b border-border">
-        <div className="h-[53px] flex items-center justify-between px-4">
+    <div className="mx-auto min-h-screen w-full min-w-0 max-w-[700px] border-x border-border">
+      <header className="sticky top-0 z-20 border-b border-border bg-bg">
+        <div className="flex h-[53px] items-center justify-between px-4">
           <div className="flex items-center gap-3">
-            <Link href="/" title="Kembali" className="text-text hover:bg-text/10 rounded-full p-2 -m-2 transition-colors">
-              ←
+            <Link
+              href="/"
+              aria-label="Kembali ke beranda"
+              className="flex min-h-11 min-w-11 items-center justify-center rounded-lg text-text transition-colors hover:bg-bg-input"
+            >
+              <ArrowLeft size={20} aria-hidden="true" />
             </Link>
-            <h1 className="font-semibold text-[19px]">Styleguide</h1>
+            <h1 className="text-[19px] font-semibold">Styleguide</h1>
           </div>
           <ThemeToggle />
         </div>
-        <nav className="px-4 pb-2 flex gap-2 flex-wrap text-[13px]">
+        <nav aria-label="Bagian styleguide" className="flex flex-wrap gap-2 px-4 pb-2 text-[13px]">
           {[
             ["warna", "Warna"],
             ["tipografi", "Tipografi"],
@@ -96,17 +100,17 @@ export default function StyleguidePage() {
             ["stat", "Stat & Empty"],
             ["ikon", "Ikon"],
           ].map(([id, label]) => (
-            <a key={id} href={`#${id}`} className="rounded-full border border-border px-3 py-1 text-text-muted hover:text-text hover:bg-bg-input/60 transition-colors">
+            <a key={id} href={`#${id}`} className="flex min-h-11 items-center rounded-lg border border-border px-3 py-1 text-text-muted transition-colors hover:bg-bg-input hover:text-text">
               {label}
             </a>
           ))}
         </nav>
       </header>
 
-      <Section id="warna" title="Warna (DESIGN.md §2.1)" desc="Dark default; klik toggle kanan-atas untuk light.">
-        <div className="grid grid-cols-3 sm:grid-cols-3 gap-3">
+      <Section id="warna" title="Warna" desc="Token warna dari globals.css. Gelap adalah bawaan, tombol tema di kanan atas beralih ke terang.">
+        <div className="grid grid-cols-3 gap-3 sm:grid-cols-3">
           {COLORS.map(([n, v]) => (
-            <div key={n} className="rounded-2xl border border-border overflow-hidden">
+            <div key={n} className="overflow-hidden rounded-xl border border-border">
               <div className="h-14" style={{ background: `var(${v})` }} />
               <div className="px-2 py-1.5 text-[12px]">
                 <div className="font-semibold">{n.split(" ")[0]}</div>
@@ -118,7 +122,7 @@ export default function StyleguidePage() {
         </div>
       </Section>
 
-      <Section id="tipografi" title="Tipografi (§2.2)" desc="Font stack sistem, tanpa import font berat.">
+      <Section id="tipografi" title="Tipografi" desc="Font stack sistem, tanpa import font berat. Angka harga memakai tabular-nums agar tidak bergeser.">
         <div className="space-y-3">
           {TYPO.map(([label, cls, sample]) => (
             <div key={label}>
@@ -132,7 +136,7 @@ export default function StyleguidePage() {
         </div>
       </Section>
 
-      <Section id="tombol" title="Tombol & Ukuran" desc="Radius 16, 15px semibold — semua varian di komponen <Button>.">
+      <Section id="tombol" title="Tombol & Ukuran" desc="Teks 15px semibold. Semua varian ada di komponen <Button>.">
         <div className="flex flex-wrap items-center gap-3">
           <Button>Posting</Button>
           <Button variant="secondary">Ikuti</Button>
@@ -144,38 +148,38 @@ export default function StyleguidePage() {
         </div>
       </Section>
 
-      <Section id="badge" title="Badge (§7)" desc="Verified = SVG check biru; pills reputasi lain lonjong.">
+      <Section id="badge" title="Badge" desc="Verified memakai check biru. Badge reputasi lain berupa chip kecil, bukan hiasan.">
         <div className="space-y-2 text-[15px]">
-          <div className="flex items-center gap-1.5 flex-wrap">
+          <div className="flex flex-wrap items-center gap-1.5">
             <span className="font-semibold">Papa Emas</span>
             <UserBadges types={["verified"]} />
-            <span className="font-semibold ml-2">Ibu Koin</span>
+            <span className="ml-2 font-semibold">Ibu Koin</span>
             <UserBadges types={["sniper", "consistent"]} />
-            <span className="font-semibold ml-2">Whale X</span>
+            <span className="ml-2 font-semibold">Whale X</span>
             <UserBadges types={["curator", "profit_hunter"]} />
-            <span className="font-semibold ml-2">Riset Kucing</span>
+            <span className="ml-2 font-semibold">Riset Kucing</span>
             <UserBadges types={["analyst"]} />
           </div>
           <div className="text-[13px] text-text-muted">ukuran sm (di dalam PostCard):</div>
           <div className="flex items-center gap-1.5 text-[13px]">
             <Avatar name="Papa Emas" size={20} />
-            <span className="font-semibold text-[13px]">Papa Emas</span>
+            <span className="text-[13px] font-semibold">Papa Emas</span>
             <UserBadges types={["verified", "sniper"]} size="sm" />
           </div>
         </div>
       </Section>
 
-      <Section id="kartu" title="PostCard + SignalCard + QuoteCard (§5)" desc="Anatomi lengkap — contoh 2 post: XAUUSD (METAL, SHORT) & BTCUSDT (LONG).">
+      <Section id="kartu" title="PostCard + SignalCard + QuoteCard" desc="Anatomi lengkap. Contoh 2 post: XAUUSD (METAL, SHORT) dan BTCUSDT (LONG).">
         <DemoPostCard symbol="XAUUSD" />
         <PostCardVariant />
       </Section>
 
-      <Section id="stat" title="StatTile & EmptyState (§5.5)">
+      <Section id="stat" title="StatTile & EmptyState" desc="Contoh tampilan komponen, bukan data akun nyata.">
         <div className="grid grid-cols-2 gap-3">
           <StatTile label="Tayangan 30 hari" value="84 rb" delta={12} />
           <StatTile label="Win-rate" value="72%" delta={-3} />
         </div>
-        <div className="mt-4 border border-border rounded-2xl overflow-hidden">
+        <div className="mt-4 overflow-hidden rounded-xl border border-border">
           <EmptyState
             title="Belum ada sinyal di sini… belum"
             subtitle="Jadilah yang pertama dengan mempost sinyal XAUUSD."
@@ -184,36 +188,36 @@ export default function StyleguidePage() {
         </div>
       </Section>
 
-      <Section id="ikon" title="Ikon (§8)" desc="lucide-react, stroke 2 (nav 1.8), size nav 26 / engagement 18.">
+      <Section id="ikon" title="Ikon" desc="lucide-react, stroke 2 (nav 1.8), size nav 26 / engagement 18. Setiap ikon dipilih karena relevan dengan isinya.">
         <div className="flex flex-wrap gap-5 text-text">
           {[Home, Flame, Bell, Bookmark, User, Settings, Feather, MessageCircle, Repeat2, Heart, Share, Trophy, Target].map((I, i) => (
-            <I key={i} size={i < 6 ? 26 : 18} strokeWidth={i < 6 ? 1.8 : 2} />
+            <I key={i} size={i < 6 ? 26 : 18} strokeWidth={i < 6 ? 1.8 : 2} aria-hidden="true" />
           ))}
         </div>
       </Section>
 
       <footer className="px-6 py-8 text-[13px] text-text-muted">
-        Neuraly · Phase 0 · Design doc: <code>DESIGN.md</code> · Spec: <code>spesifikasi.md</code>
+        Neuraly · Token warna dan radius mengikuti globals.css
       </footer>
     </div>
   );
 }
 
-/** Contoh PostCard kedua: BTCUSDT LONG yang sudah TP (lihat chip). */
+// Contoh PostCard kedua: BTCUSDT LONG yang sudah TP (lihat chip).
 function PostCardVariant() {
   return (
-    <article className="border-b border-border p-4 hover:bg-text/3 transition-colors duration-150">
+    <article className="border-b border-border p-4 transition-colors duration-150 hover:bg-text/3">
       <div className="flex gap-3">
         <Avatar name="Whal" />
-        <div className="flex-1 min-w-0">
+        <div className="min-w-0 flex-1">
           <div className="flex items-center gap-1 text-[15px]">
             <span className="font-semibold">Whal X</span>
             <UserBadges types={["verified", "curator", "profit_hunter"]} size="sm" />
-            <span className="text-text-muted ml-1">@whalex</span>
+            <span className="ml-1 text-text-muted">@whalex</span>
             <span className="text-text-muted">·</span>
             <time className="text-text-muted">1 d</time>
           </div>
-          <p className="mt-1">Result di sini — TP tercapai 2 hari sejak entry</p>
+          <p className="mt-1">Result di sini. TP tercapai 2 hari sejak entry</p>
           <SignalCard
             symbol="BTCUSDT"
             direction="LONG"

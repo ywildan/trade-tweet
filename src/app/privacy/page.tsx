@@ -12,7 +12,7 @@ function Section({ title, children }: { title: string; children: React.ReactNode
   return (
     <section className="mt-8">
       <h2 className="text-[19px] font-bold">{title}</h2>
-      <div className="mt-2 space-y-3 text-[15px] leading-7 text-text-muted">
+      <div className="mt-2 space-y-3 text-[15px] leading-7 text-text">
         {children}
       </div>
     </section>
@@ -21,7 +21,7 @@ function Section({ title, children }: { title: string; children: React.ReactNode
 
 export default function PrivacyPage() {
   return (
-    <main className="mx-auto w-full max-w-[640px] px-5 py-10">
+    <main className="mx-auto w-full max-w-[640px] px-5 pb-16 pt-10">
       <Logo size={36} />
       <h1 className="mt-6 text-[28px] font-bold leading-9">Kebijakan Privasi</h1>
       <p className="mt-1 text-[14px] text-text-muted">
@@ -34,7 +34,7 @@ export default function PrivacyPage() {
           Saat kamu membuat akun, kami menyimpan nama, username, alamat
           email, dan foto profil bila ada. Bila kamu masuk dengan Google,
           Google mengirimkan nama, alamat email, dan foto profil akun
-          Google-mu — hanya itu yang kami terima dari Google, dan kami tidak
+          Google-mu, hanya itu yang kami terima dari Google, dan kami tidak
           mengakses email, kontak, atau data Google-mu yang lain.
         </p>
         <p>
@@ -76,7 +76,7 @@ export default function PrivacyPage() {
         <p>
           Kamu bisa mengubah nama, bio, dan foto profil dari halaman profil.
           Untuk menghapus akun beserta datanya, hubungi kami lewat email di
-          bawah — penghapusan bersifat permanen dan tidak dapat dibatalkan.
+          bawah. Penghapusan bersifat permanen dan tidak dapat dibatalkan.
         </p>
       </Section>
 

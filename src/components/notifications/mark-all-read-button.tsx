@@ -33,7 +33,7 @@ export function MarkAllReadButton() {
       type="button"
       onClick={markAll}
       disabled={busy}
-      className="inline-flex items-center gap-1.5 rounded-full border border-border px-3 py-1.5 text-[13px] font-semibold text-text-muted transition-colors hover:bg-bg-input/60 hover:text-text disabled:opacity-60"
+      className="inline-flex min-h-11 items-center gap-1.5 rounded-lg border border-border px-3 py-1.5 text-[13px] font-semibold text-text-muted transition-colors hover:bg-bg-input/60 hover:text-text disabled:opacity-60"
     >
       {busy && <Loader2 size={13} className="animate-spin" />}
       Tandai semua dibaca

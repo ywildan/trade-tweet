@@ -31,7 +31,7 @@ export function Logo({
   return (
     <Link
       href={href}
-      aria-label="Neuraly — beranda"
+      aria-label="Neuraly · Beranda"
       className="inline-flex items-center gap-2 text-text"
     >
       <LogoMark size={size} />

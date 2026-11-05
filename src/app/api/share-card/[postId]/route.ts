@@ -5,9 +5,9 @@ import { computeSignalPnl } from "@/lib/signal-resolver";
 
 type Context = { params: Promise<{ postId: string }> };
 
-// Kartu harus selalu mencerminkan status/PnL terbaru: tandai dinamis
-// lewat connection() (segment config `dynamic` tidak kompatibel dengan
-// Cache Components di Next 16 dan menggagalkan build).
+// Kartu mencerminkan status/PnL terbaru, jadi tandai dinamis lewat
+// connection(). Segment config `dynamic` tidak kompatibel dengan Cache
+// Components di Next 16 dan menggagalkan build.
 
 function escapeXml(value: string) {
   return value
@@ -19,7 +19,7 @@ function escapeXml(value: string) {
 }
 
 /**
- * GET /api/share-card/[postId] — kartu SVG 1200×675 (DESIGN.md §5.4).
+ * GET /api/share-card/[postId]: kartu SVG 1200x675.
  * Hanya sinyal TP_HIT / SL_HIT yang tidak disputed.
  */
 async function getShareCard(request: Request, context: Context) {
@@ -93,21 +93,10 @@ async function getShareCard(request: Request, context: Context) {
   const totalSignals = post.author.signalStats?.totalSignals ?? 0;
 
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="675" viewBox="0 0 1200 675" role="img" aria-labelledby="title desc" font-family="-apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif">
-  <title id="title">${symbol} ${direction} — ${statusLabel} ${formatPnl(pnl)}</title>
+  <title id="title">${symbol} ${direction} · ${statusLabel} ${formatPnl(pnl)}</title>
   <desc id="desc">Kartu hasil sinyal ${symbol} dari @${escapeXml(post.author.username)} di Neuraly.</desc>
-  <defs>
-    <pattern id="grid" width="60" height="60" patternUnits="userSpaceOnUse">
-      <path d="M 60 0 L 0 0 0 60" fill="none" stroke="#ffffff" stroke-opacity="0.04" stroke-width="1"/>
-    </pattern>
-    <radialGradient id="glow" cx="84%" cy="92%" r="78%">
-      <stop offset="0%" stop-color="${accent}" stop-opacity="0.20"/>
-      <stop offset="100%" stop-color="${accent}" stop-opacity="0"/>
-    </radialGradient>
-  </defs>
 
-  <rect width="1200" height="675" fill="#0b0f14"/>
-  <rect width="1200" height="675" fill="url(#grid)"/>
-  <rect width="1200" height="675" fill="url(#glow)"/>
+  <rect width="1200" height="675" fill="#0f1419"/>
 
   <g transform="translate(64,42)">
     <rect x="0" y="16" width="8" height="28" rx="2" fill="#00ba7c"/>
@@ -119,30 +108,32 @@ async function getShareCard(request: Request, context: Context) {
   </g>
   <text x="126" y="82" font-size="30" font-weight="700" fill="#e7e9ea">Neuraly</text>
 
-  <text x="1136" y="80" text-anchor="end" font-size="18" letter-spacing="2" fill="#71767b">${
+  <text x="1136" y="80" text-anchor="end" font-size="18" fill="#9aa0a6">${
     verified ? "TRADER TERVERIFIKASI" : "SINYAL NEURALY"
   }</text>
 
   <text x="64" y="196" font-size="64" font-weight="700" fill="#e7e9ea">${symbol} <tspan fill="${accent}">· ${direction}</tspan></text>
-  <text x="64" y="244" font-size="26" font-weight="700" letter-spacing="3" fill="${accent}">${statusLabel}</text>
 
-  <text x="64" y="386" font-size="120" font-weight="700" fill="${accent}">${formatPnl(
+  <rect x="64" y="216" width="1072" height="52" rx="8" fill="${accent}"/>
+  <text x="88" y="250" font-size="22" font-weight="700" fill="#000000">${statusLabel}</text>
+
+  <text x="64" y="386" font-size="120" font-weight="700" fill="${accent}" font-variant-numeric="tabular-nums">${formatPnl(
     pnl,
   )}</text>
 
-  <text x="64" y="462" font-size="27" fill="#9ba3ad">Entry ${formatPrice(
+  <text x="64" y="462" font-size="27" fill="#9aa0a6" font-variant-numeric="tabular-nums">Entry ${formatPrice(
     entry,
   )} → ${isTp ? "TP" : "SL"} ${formatPrice(exit)} · Stop ${formatPrice(
     post.stopLoss ?? entry,
   )}</text>
 
-  <line x1="64" y1="520" x2="1136" y2="520" stroke="#ffffff" stroke-opacity="0.12" stroke-width="1"/>
+  <line x1="64" y1="520" x2="1136" y2="520" stroke="#2f3336" stroke-width="1"/>
 
   <text x="64" y="592" font-size="28" font-weight="600" fill="#e7e9ea">@${escapeXml(
     post.author.username,
   )}</text>
-  <text x="64" y="628" font-size="20" fill="#71767b">Win-rate ${winRate}% · ${totalSignals} sinyal</text>
-  <text x="1136" y="628" text-anchor="end" font-size="20" fill="#71767b">Neuraly · sinyal dengan bukti</text>
+  <text x="64" y="628" font-size="20" fill="#9aa0a6" font-variant-numeric="tabular-nums">Win-rate ${winRate}% · ${totalSignals} sinyal</text>
+  <text x="1136" y="628" text-anchor="end" font-size="20" fill="#9aa0a6">Neuraly · sinyal dengan bukti</text>
 </svg>`;
 
   const url = new URL(request.url);

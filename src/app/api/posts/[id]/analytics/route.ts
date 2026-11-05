@@ -4,7 +4,7 @@ import { getPostAnalytics } from "@/lib/analytics";
 
 type Context = { params: Promise<{ id: string }> };
 
-/** GET /api/posts/[id]/analytics — hanya pemilik post (spesifikasi.md §5). */
+/** GET /api/posts/[id]/analytics: hanya pemilik post (spesifikasi.md §5). */
 export async function GET(_request: Request, context: Context) {
   try {
     const session = await auth();

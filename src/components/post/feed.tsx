@@ -71,9 +71,7 @@ export function Feed({
 
   useEffect(() => {
     const node = sentinelRef.current;
-    // Saat error, observer dimatikan: retry hanya lewat tombol "Coba lagi".
-    // Tanpa penjaga ini, observer yang dibuat ulang setelah loading kembali
-    // false akan langsung memanggil loadMore lagi tanpa henti.
+    // Saat error, observer dimatikan supaya retry hanya lewat tombol Coba lagi.
     if (!node || !cursor || error) return;
     const observer = new IntersectionObserver(
       (entries) => {
@@ -102,8 +100,12 @@ export function Feed({
   if (items.length === 0) {
     return (
       <EmptyState
-        title="Belum ada postingan di sini… belum"
-        subtitle="Jadilah yang pertama membagikan setup hari ini."
+        title="Belum ada postingan di sini"
+        subtitle={
+          tab === "following"
+            ? "Trader yang kamu ikuti belum memposting. Buat sinyal sendiri, atau cek lagi nanti."
+            : "Jadilah yang pertama membagikan setup hari ini."
+        }
         cta={
           isGuest ? (
             <Link href="/register">

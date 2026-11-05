@@ -5,7 +5,7 @@ import { formatPrice } from "@/lib/format";
 
 type Quote = { price: number; ts: number };
 
-/** Harga simbol dengan polling 30 detik (DESIGN.md §3: /symbol/[symbol]). */
+/** Harga simbol dengan polling 30 detik. */
 export function SymbolPrice({
   symbol,
   initial,
@@ -38,8 +38,7 @@ export function SymbolPrice({
       }
     }
 
-    // Ambil langsung saat mount, bukan menunggu interval pertama 30 detik:
-    // bila quote server null, pengguna sebelumnya melihat "—" selama 30 detik.
+    // Ambil langsung saat mount, bukan menunggu interval pertama 30 detik.
     void load();
     const timer = setInterval(load, 30_000);
     return () => {
@@ -49,15 +48,18 @@ export function SymbolPrice({
   }, [symbol]);
 
   return (
-    <div className="rounded-2xl border border-border bg-bg-elev p-4">
+    <div className="rounded-xl border border-border bg-bg-elev p-4">
       <div className="flex items-baseline justify-between gap-3">
         <span className="text-[13px] text-text-muted">Harga saat ini</span>
         <span className="text-[13px] text-text-muted">
-          {error ? "delay feed" : "live · 30 dtk"}
+          {error ? "feed tertunda" : "live · 30 dtk"}
         </span>
       </div>
-      <div className="mt-1 text-[32px] font-bold leading-9 tabular">
-        {quote ? formatPrice(quote.price) : "—"}
+      <div
+        className="mt-1 text-[32px] font-bold leading-9 tabular"
+        aria-live="polite"
+      >
+        {quote ? formatPrice(quote.price) : "Belum tersedia"}
       </div>
       <p className="mt-1 text-[13px] text-text-muted" suppressHydrationWarning>
         {quote

@@ -46,7 +46,7 @@ export default async function AdminBadgesPage({
 
   return (
     <>
-      <header className="sticky top-0 z-20 flex h-[53px] items-center gap-2 border-b border-border bg-bg/65 px-4 backdrop-blur">
+      <header className="sticky top-0 z-20 flex h-[53px] items-center gap-2 border-b border-border bg-bg px-4">
         <div>
           <h1 className="text-[20px] font-bold leading-6">Admin · Badge</h1>
           <p className="text-[13px] leading-4 text-text-muted">
@@ -59,29 +59,34 @@ export default async function AdminBadgesPage({
         action="/admin/badges"
         method="get"
         role="search"
-        className="flex gap-2 border-b border-border px-4 py-3"
+        className="border-b border-border px-4 py-3"
       >
-        <label className="sr-only" htmlFor="admin-user-search">
+        <label
+          htmlFor="admin-user-search"
+          className="mb-1 block text-[13px] font-semibold text-text"
+        >
           Cari pengguna
         </label>
-        <input
-          id="admin-user-search"
-          type="search"
-          name="q"
-          defaultValue={query}
-          placeholder="Cari username atau nama…"
-          className="w-full rounded-xl border border-border bg-bg-input px-3 py-2 text-[14px] outline-none placeholder:text-text-muted"
-        />
-        <button
-          type="submit"
-          className="rounded-xl bg-accent px-4 py-2 text-[14px] font-semibold text-white"
-        >
-          Cari
-        </button>
+        <div className="flex gap-2">
+          <input
+            id="admin-user-search"
+            type="search"
+            name="q"
+            defaultValue={query}
+            placeholder="Cari username atau nama…"
+            className="min-h-11 w-full rounded-lg border border-border bg-bg-input px-3 py-2 text-[14px] placeholder:text-text-muted"
+          />
+          <button
+            type="submit"
+            className="inline-flex min-h-11 shrink-0 items-center justify-center rounded-lg bg-text px-4 py-2 text-[14px] font-semibold text-bg transition-colors hover:bg-text/90"
+          >
+            Cari
+          </button>
+        </div>
       </form>
       {users.length === 50 && (
         <p className="border-b border-border px-4 py-2 text-[13px] text-text-muted">
-          Menampilkan maksimal 50 pengguna — persempit dengan pencarian.
+          Menampilkan maksimal 50 pengguna, persempit dengan pencarian.
         </p>
       )}
 
