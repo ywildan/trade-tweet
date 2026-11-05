@@ -1,11 +1,23 @@
 import { MobileNavLink } from "@/components/layout/nav-link";
+import { GuestMobileNav } from "@/components/layout/guest-mobile-nav";
 import { getUnreadNotificationCount } from "@/lib/notifications";
 import { getSessionUser } from "@/lib/session";
 
 export async function NavMobile() {
   const user = await getSessionUser();
-  const unread = user ? await getUnreadNotificationCount(user.id) : 0;
 
+  // Tamu tidak lagi diberi item nav Masuk/Daftar: fitur terproteksi
+  // membuka popup masuk/daftar lewat GuestMobileNav.
+  if (!user) {
+    return <GuestMobileNav />;
+  }
+
+  const unread = await getUnreadNotificationCount(user.id);
+
+  // Bottom nav login dibuat compact: 4 item utama saja. Analitik
+  // pindah ke halaman profil sendiri, dan Kelola profil sudah
+  // terjangkau lewat tombol "Edit profil" di halaman yang sama —
+  // keduanya tidak lagi menghabiskan slot nav.
   return (
     <nav
       aria-label="Navigasi utama"
@@ -13,37 +25,18 @@ export async function NavMobile() {
     >
       <MobileNavLink href="/" icon="home" label="Utama" exact />
       <MobileNavLink
-        href={user ? "/notifications" : "/login?next=%2Fnotifications"}
+        href="/notifications"
         icon="bell"
         label="Notifikasi"
         badge={unread}
       />
+      <MobileNavLink href="/bookmarks" icon="bookmark" label="Simpanan" />
       <MobileNavLink
-        href={user ? "/bookmarks" : "/login?next=%2Fbookmarks"}
-        icon="bookmark"
-        label="Simpanan"
-      />
-      <MobileNavLink
-        href={user ? "/dashboard" : "/login?next=%2Fdashboard"}
-        icon="analytics"
-        label="Analitik"
-      />
-      <MobileNavLink
-        href={user ? `/@${user.username}` : "/login"}
+        href={`/@${user.username}`}
         icon="user"
-        label={user ? "Profil" : "Masuk"}
+        label="Profil"
         exact
       />
-      {user ? (
-        <MobileNavLink
-          href="/settings/profile"
-          icon="settings"
-          label="Kelola"
-          exact
-        />
-      ) : (
-        <MobileNavLink href="/register" icon="userplus" label="Daftar" />
-      )}
     </nav>
   );
 }

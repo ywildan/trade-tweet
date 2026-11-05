@@ -2,7 +2,12 @@ import type { Metadata } from "next";
 import { BackButton } from "@/components/ui/back-button";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { CalendarDays, MapPin } from "lucide-react";
+import {
+  CalendarDays,
+  ChartNoAxesColumn,
+  ChevronRight,
+  MapPin,
+} from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Avatar } from "@/components/ui/avatar";
@@ -263,6 +268,33 @@ async function ProfileView({
               tone={(stats?.avgPnl ?? 0) >= 0 ? "long" : "short"}
             />
           </div>
+
+          {/*
+            Pengganti item nav Analitik yang dihapus dari bottom nav:
+            hanya untuk profil sendiri, karena dashboard memang khusus
+            pemilik akun. Kelola profil tidak perlu tautan kedua di sini
+            karena tombol "Edit profil" di atas sudah mengarah ke sana.
+          */}
+          {isSelf && (
+            <Link
+              href="/dashboard"
+              className="mt-3 flex items-center justify-between rounded-2xl border border-border bg-bg-elev px-3 py-2.5 text-[15px] font-semibold transition-colors hover:bg-text/[0.03]"
+            >
+              <span className="inline-flex items-center gap-2">
+                <ChartNoAxesColumn
+                  size={18}
+                  className="text-text-muted"
+                  aria-hidden
+                />
+                Analitik lengkap
+              </span>
+              <ChevronRight
+                size={18}
+                className="text-text-muted"
+                aria-hidden
+              />
+            </Link>
+          )}
         </div>
       </div>
 
