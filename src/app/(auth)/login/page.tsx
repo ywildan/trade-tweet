@@ -17,21 +17,51 @@ function safeNext(raw: string | string[] | undefined): string {
     : "/";
 }
 
+/** Pesan ramah untuk kode error NextAuth (?error=) setelah OAuth gagal. */
+function oauthErrorMessage(raw: string | string[] | undefined): string | null {
+  const code = Array.isArray(raw) ? raw[0] : raw;
+  if (!code) return null;
+  switch (code) {
+    case "AccessDenied":
+      return "Login Google/X dibatalkan atau ditolak. Coba lagi.";
+    case "OAuthAccountNotLinked":
+      return "Email ini sudah terdaftar dengan cara masuk lain. Masuk dengan cara yang dulu dipakai.";
+    case "OAuthCallback":
+    case "OAuthCreateAccount":
+    case "Callback":
+      return "Login OAuth gagal diproses. Coba lagi.";
+    case "Configuration":
+      return "Login OAuth belum dikonfigurasi dengan benar. Coba lagi nanti.";
+    default:
+      return "Terjadi kesalahan saat login. Coba lagi.";
+  }
+}
+
 export default async function LoginPage({
   searchParams,
 }: {
-  searchParams: Promise<{ next?: string | string[] }>;
+  searchParams: Promise<{ next?: string | string[]; error?: string | string[] }>;
 }) {
   const params = await searchParams;
   const callbackUrl = safeNext(params.next);
+  const oauthError = oauthErrorMessage(params.error);
   const { google, twitter } = enabledOAuthProviders;
 
   return (
     <>
-      <h1 className="text-[30px] font-bold leading-9">Masuk ke SPMTrade</h1>
+      <h1 className="text-[30px] font-bold leading-9">Masuk ke Neuraly</h1>
       <p className="mt-1 text-[15px] text-text-muted">
         Lanjutkan membangun rekam jejak tradingmu.
       </p>
+
+      {oauthError && (
+        <p
+          role="alert"
+          className="mt-4 rounded-lg border border-short/40 bg-short/10 px-3 py-2 text-[13px] text-short"
+        >
+          {oauthError}
+        </p>
+      )}
 
       <div className="mt-6 space-y-4">
         {(google || twitter) && (

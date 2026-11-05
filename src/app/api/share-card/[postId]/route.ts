@@ -94,7 +94,7 @@ async function getShareCard(request: Request, context: Context) {
 
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="675" viewBox="0 0 1200 675" role="img" aria-labelledby="title desc" font-family="-apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif">
   <title id="title">${symbol} ${direction} — ${statusLabel} ${formatPnl(pnl)}</title>
-  <desc id="desc">Kartu hasil sinyal ${symbol} dari @${escapeXml(post.author.username)} di SPMTrade.</desc>
+  <desc id="desc">Kartu hasil sinyal ${symbol} dari @${escapeXml(post.author.username)} di Neuraly.</desc>
   <defs>
     <pattern id="grid" width="60" height="60" patternUnits="userSpaceOnUse">
       <path d="M 60 0 L 0 0 0 60" fill="none" stroke="#ffffff" stroke-opacity="0.04" stroke-width="1"/>
@@ -117,10 +117,10 @@ async function getShareCard(request: Request, context: Context) {
     <rect x="32" y="22" width="8" height="20" rx="2" fill="#1d9bf0"/>
     <line x1="36" y1="14" x2="36" y2="50" stroke="#1d9bf0" stroke-width="2"/>
   </g>
-  <text x="126" y="82" font-size="30" font-weight="700" fill="#e7e9ea">SPMTrade</text>
+  <text x="126" y="82" font-size="30" font-weight="700" fill="#e7e9ea">Neuraly</text>
 
   <text x="1136" y="80" text-anchor="end" font-size="18" letter-spacing="2" fill="#71767b">${
-    verified ? "TRADER TERVERIFIKASI" : "SINYAL SPMTRADE"
+    verified ? "TRADER TERVERIFIKASI" : "SINYAL NEURALY"
   }</text>
 
   <text x="64" y="196" font-size="64" font-weight="700" fill="#e7e9ea">${symbol} <tspan fill="${accent}">· ${direction}</tspan></text>
@@ -142,7 +142,7 @@ async function getShareCard(request: Request, context: Context) {
     post.author.username,
   )}</text>
   <text x="64" y="628" font-size="20" fill="#71767b">Win-rate ${winRate}% · ${totalSignals} sinyal</text>
-  <text x="1136" y="628" text-anchor="end" font-size="20" fill="#71767b">SPMTrade · sinyal dengan bukti</text>
+  <text x="1136" y="628" text-anchor="end" font-size="20" fill="#71767b">Neuraly · sinyal dengan bukti</text>
 </svg>`;
 
   const url = new URL(request.url);
@@ -153,7 +153,7 @@ async function getShareCard(request: Request, context: Context) {
   };
   if (download) {
     headers["Content-Disposition"] =
-      `attachment; filename="spmtrade-${post.symbol ?? "signal"}-${
+      `attachment; filename="neuraly-${post.symbol ?? "signal"}-${
         isTp ? "TP" : "SL"
       }-${post.id}.svg"`;
   }

@@ -48,7 +48,7 @@ export async function generateMetadata({
       : `Postingan @${row.author.username}`);
 
   const title = `${snippet} — @${row.author.username}`;
-  const description = `Postingan ${row.author.name} di SPMTrade.`;
+  const description = `Postingan ${row.author.name} di Neuraly.`;
 
   const headerStore = await headers();
   const host =
@@ -72,7 +72,7 @@ export async function generateMetadata({
           url: imageUrl,
           width: 1200,
           height: 630,
-          alt: `Postingan @${row.author.username} di SPMTrade`,
+          alt: `Postingan @${row.author.username} di Neuraly`,
         },
       ],
     },

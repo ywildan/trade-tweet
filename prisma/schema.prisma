@@ -1,4 +1,4 @@
-// SPMTrade — Prisma schema (spesifikasi.md §3, TERKUNCI).
+// Neuraly — Prisma schema (spesifikasi.md §3, TERKUNCI).
 // Migrasi DB dijalankan pada Phase 1 setelah provider Postgres tersedia.
 
 generator client {

@@ -4,8 +4,8 @@ import { ToastProvider } from "@/components/ui/toast";
 
 export const metadata: Metadata = {
   title: {
-    default: "SPMTrade — Media sosial sinyal trading",
-    template: "%s — SPMTrade",
+    default: "Neuraly — Media sosial sinyal trading",
+    template: "%s — Neuraly",
   },
   description:
     "Post sinyal trading seperti tweet. Kualitasmu terbukti lewat badge, win-rate, dan kartu share otomatis saat profit.",

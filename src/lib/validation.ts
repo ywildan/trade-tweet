@@ -220,7 +220,7 @@ export const postSchema = z
           ctx.addIssue({
             code: "custom",
             path: ["symbol"],
-            message: "Simbol tidak ada di katalog crypto SPMTrade.",
+            message: "Simbol tidak ada di katalog crypto Neuraly.",
           });
         }
       }

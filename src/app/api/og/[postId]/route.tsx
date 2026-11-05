@@ -112,7 +112,7 @@ async function getOg(_request: Request, context: Context) {
               <div style={{ height: "18px", background: SHORT, borderRadius: "2px" }} />
               <div style={{ height: "22px", background: ACCENT, borderRadius: "2px" }} />
             </div>
-            <div style={{ fontSize: "34px", fontWeight: 700 }}>SPMTrade</div>
+            <div style={{ fontSize: "34px", fontWeight: 700 }}>Neuraly</div>
           </div>
           <div
             style={{
@@ -121,7 +121,7 @@ async function getOg(_request: Request, context: Context) {
               color: MUTED,
             }}
           >
-            {verified ? "TRADER TERVERIFIKASI" : "SINYAL SPMTRADE"}
+            {verified ? "TRADER TERVERIFIKASI" : "SINYAL NEURALY"}
           </div>
         </div>
 
@@ -179,7 +179,7 @@ async function getOg(_request: Request, context: Context) {
                 maxWidth: "980px",
               }}
             >
-              {content || `Postingan @${post.author.username} di SPMTrade`}
+              {content || `Postingan @${post.author.username} di Neuraly`}
             </div>
           </div>
         )}

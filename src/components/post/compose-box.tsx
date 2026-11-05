@@ -142,7 +142,7 @@ export function ComposeBox({
       } else if (meta && meta.market !== market) {
         result.symbol = `Simbol ini milik market ${meta.market}.`;
       } else if (market === "CRYPTO" && !meta) {
-        result.symbol = "Simbol tidak ada di katalog crypto SPMTrade.";
+        result.symbol = "Simbol tidak ada di katalog crypto Neuraly.";
       }
     }
 

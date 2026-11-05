@@ -17,12 +17,12 @@ export async function NavSidebar() {
       <div>
         <Link
           href="/"
-          aria-label="SPMTrade — beranda"
+          aria-label="Neuraly — beranda"
           className="flex w-fit items-center gap-2 rounded-full p-3 transition-colors hover:bg-text/10"
         >
           <LogoMark size={32} />
           <span className="hidden text-[22px] font-bold tracking-tight xl:inline">
-            SPM<span className="text-accent">Trade</span>
+            Neural<span className="text-accent">y</span>
           </span>
         </Link>
 

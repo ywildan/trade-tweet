@@ -31,13 +31,13 @@ export function Logo({
   return (
     <Link
       href={href}
-      aria-label="SPMTrade — beranda"
+      aria-label="Neuraly — beranda"
       className="inline-flex items-center gap-2 text-text"
     >
       <LogoMark size={size} />
       {withWordmark && (
         <span className="text-[22px] font-bold tracking-tight">
-          SPM<span className="text-accent">Trade</span>
+          Neural<span className="text-accent">y</span>
         </span>
       )}
     </Link>

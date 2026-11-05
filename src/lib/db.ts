@@ -16,7 +16,7 @@ const connectionString =
   process.env.DATABASE_URL ??
   (process.env.NODE_ENV === "production"
     ? undefined
-    : "postgresql://postgres:postgres@localhost:5432/spmtrade");
+    : "postgresql://postgres:postgres@localhost:5432/neuraly");
 
 if (!connectionString) {
   throw new Error("DATABASE_URL belum diset.");

@@ -117,7 +117,7 @@ export const { handlers, auth, signIn, signOut, unstable_update } = NextAuth({
       // per akun provider agar user tetap punya baris unik di DB.
       const email =
         user.email?.toLowerCase() ??
-        `${account.provider}-${account.providerAccountId}@oauth.spmtrade.local`;
+        `${account.provider}-${account.providerAccountId}@oauth.neuraly.local`;
 
       const dbUser = await ensureOAuthUser({
         email,

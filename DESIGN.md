@@ -1,4 +1,4 @@
-# SPMTRADE — Spesifikasi Desain, Layout & UI
+# NEURALY — Spesifikasi Desain, Layout & UI
 
 > Pendamping file `spesifikasi.md`. Semua keputusan visual ada di sini.
 > **Prinsip:** tiru tata letak & pola interaksi **X.com**, tapi identitas visual trader: hijau/merah PnL, tipografi monotone, dark-mode-first.
@@ -20,7 +20,7 @@
 │  👤 Profil           ├─────────────────┤     │  minggu ini" ─────┘ │
 │  ⚙ Kelola            │   Feed list     │     ┌─ Kartu "Siapa di- ┐│
 │  [Tombol Post besar] │   (infinite)    │     │  ikuti" ─────────┘│
-│  [akun bawah kiri]   │                 │     └─ SPMTrade footer   │
+│  [akun bawah kiri]   │                 │     └─ Neuraly footer   │
 └────────────────────────────────────────────────────────────────────┘
 ```
 
@@ -182,7 +182,7 @@ font-family: -apple-system, "Segoe UI", Roboto, "Helvetica Neue",
 ### 5.4 ShareCard SVG (kartu bagikan 1200×675)
 ```
 ┌──────────────────────────────────────────────────────────┐
-│ [logo SPMTrade]                 TRADER TERVERIFIKASI ✓   │  (y 48–80)
+│ [logo Neuraly]                 TRADER TERVERIFIKASI ✓   │  (y 48–80)
 │                                                          │
 │   XAUUSD · LONG                                          │  (y 120: simbol 64px bold)
 │   TP TERCAPAI 🎯                                         │  (y 180: label 28px uppercase, letterspacing 2)
@@ -197,7 +197,7 @@ font-family: -apple-system, "Segoe UI", Roboto, "Helvetica Neue",
 - Background: gelap `#0b0f14` + pattern grid halus (garis 1px alpha 4% tiap 60px) + gradasi radial hijau alpha 8% dari kanan-bawah saat TP / merah alpha 8% + label "SL TERSENTUH" saat kalah.
 - Font: pakai font-family fallback sistem, JANGAN import font file berat ke SVG.
 - Output: `image/svg+xml`, viewBox `0 0 1200 675`, tanpa dependensi eksternal; semua angka & warna dirender server-side dari data post.
-- Header response: `Content-Disposition: attachment; filename="spmtrade-XAUUSD-TP-<postid>.svg"` bila query `?download=1`.
+- Header response: `Content-Disposition: attachment; filename="neuraly-XAUUSD-TP-<postid>.svg"` bila query `?download=1`.
 
 ### 5.5 StatTile (dashboard)
 - Kartu bg-elev radius-16 padding-16; label kecil muted; angka 32px bold; delta chip hijau/merah (▲/▼); sparkline.

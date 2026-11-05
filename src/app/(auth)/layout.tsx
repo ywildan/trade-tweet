@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { Logo } from "@/components/ui/logo";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { SignalCard } from "@/components/post/signal-card";
@@ -59,7 +60,15 @@ export default function AuthLayout({
         </div>
 
         <p className="px-6 pb-6 text-center text-[13px] text-text-muted">
-          SPMTrade · Media sosial sinyal trading
+          Neuraly · Media sosial sinyal trading
+          <br />
+          <Link href="/privacy" className="hover:underline">
+            Privasi
+          </Link>
+          {" · "}
+          <Link href="/terms" className="hover:underline">
+            Syarat
+          </Link>
         </p>
       </main>
     </div>

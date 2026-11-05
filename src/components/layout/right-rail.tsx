@@ -152,9 +152,17 @@ export async function RightRail() {
       </RailCard>
 
       <p className="px-2 text-[13px] leading-5 text-text-muted">
-        SPMTrade · Media sosial sinyal trading
+        Neuraly · Media sosial sinyal trading
         <br />
         Sinyal punya bukti. Reputasi punya angka.
+        <br />
+        <Link href="/privacy" className="hover:underline">
+          Privasi
+        </Link>
+        {" · "}
+        <Link href="/terms" className="hover:underline">
+          Syarat
+        </Link>
       </p>
     </div>
   );

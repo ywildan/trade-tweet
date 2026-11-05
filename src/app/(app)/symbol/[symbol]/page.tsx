@@ -31,7 +31,7 @@ export async function generateMetadata({
   const entry = findSymbolEntry(symbol);
   return {
     title: `$${symbol}${entry ? ` — ${entry.name}` : ""}`,
-    description: `Sinyal dan analisa ${symbol} di SPMTrade.`,
+    description: `Sinyal dan analisa ${symbol} di Neuraly.`,
   };
 }
 

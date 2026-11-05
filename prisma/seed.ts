@@ -7,11 +7,11 @@ const prisma = new PrismaClient({
   adapter: new PrismaPg({
     connectionString:
       process.env.DATABASE_URL ??
-      "postgresql://postgres:postgres@localhost:5432/spmtrade",
+      "postgresql://postgres:postgres@localhost:5432/neuraly",
   }),
 });
 
-const PASSWORD = "spmtrade123";
+const PASSWORD = "neuraly123";
 
 type SeedUser = {
   username: string;
@@ -36,10 +36,10 @@ type SeedUser = {
 const users: SeedUser[] = [
   {
     username: "admin",
-    name: "Admin SPMTrade",
-    email: "admin@spmtrade.local",
+    name: "Admin Neuraly",
+    email: "admin@neuraly.local",
     role: "admin",
-    bio: "Akun admin SPMTrade. Mengelola badge, kurasi trader, dan operasional platform.",
+    bio: "Akun admin Neuraly. Mengelola badge, kurasi trader, dan operasional platform.",
     location: "Jakarta",
     avatar: "/seed/avatar-admin.svg",
     banner: "/seed/banner-blue.svg",
@@ -56,7 +56,7 @@ const users: SeedUser[] = [
   {
     username: "papaeemas",
     name: "Papa Emas",
-    email: "papa@spmtrade.local",
+    email: "papa@neuraly.local",
     bio: "Gold & silver saja. Sell the rip, buy the dip, sabar menunggu konfirmasi H4.",
     location: "Surabaya",
     avatar: "/seed/avatar-papaeemas.svg",
@@ -74,7 +74,7 @@ const users: SeedUser[] = [
   {
     username: "ibukoin",
     name: "Ibu Koin",
-    email: "ibukoin@spmtrade.local",
+    email: "ibukoin@neuraly.local",
     bio: "BTC & ETH swing. Struktur dulu, opini belakangan. Tidak pernah chase candle.",
     location: "Bandung",
     avatar: "/seed/avatar-ibukoin.svg",
@@ -92,7 +92,7 @@ const users: SeedUser[] = [
   {
     username: "whalex",
     name: "Whale X",
-    email: "whalex@spmtrade.local",
+    email: "whalex@neuraly.local",
     bio: "Mengikuti aliran likuiditas. Setup sedikit, ukuran besar, risiko terukur.",
     location: "Singapore",
     avatar: "/seed/avatar-whalex.svg",
@@ -110,7 +110,7 @@ const users: SeedUser[] = [
   {
     username: "risetkucing",
     name: "Riset Kucing",
-    email: "risetkucing@spmtrade.local",
+    email: "risetkucing@neuraly.local",
     bio: "Menulis riset on-chain dan makro kucing. Sinyal sesekali, catatan selalu.",
     location: "Yogyakarta",
     avatar: "/seed/avatar-risetkucing.svg",
@@ -617,7 +617,7 @@ async function main() {
   );
   console.log(`[seed] Login semua akun dengan password: ${PASSWORD}`);
   console.log(
-    "[seed] Admin: admin@spmtrade.local · Dummy: papa@spmtrade.local, ibukoin@spmtrade.local, whalex@spmtrade.local, risetkucing@spmtrade.local",
+    "[seed] Admin: admin@neuraly.local · Dummy: papa@neuraly.local, ibukoin@neuraly.local, whalex@neuraly.local, risetkucing@neuraly.local",
   );
 }
 

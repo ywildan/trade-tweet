@@ -193,7 +193,7 @@ export default function StyleguidePage() {
       </Section>
 
       <footer className="px-6 py-8 text-[13px] text-text-muted">
-        SPMTrade · Phase 0 · Design doc: <code>DESIGN.md</code> · Spec: <code>spesifikasi.md</code>
+        Neuraly · Phase 0 · Design doc: <code>DESIGN.md</code> · Spec: <code>spesifikasi.md</code>
       </footer>
     </div>
   );

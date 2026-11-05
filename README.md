@@ -1,4 +1,4 @@
-# SPMTrade
+# Neuraly
 
 Media sosial sinyal trading — post setup seperti tweet, dengan reputasi yang
 terukur lewat win-rate, badge, dan kartu share saat profit.
@@ -20,7 +20,7 @@ pnpm install
 cp .env.example .env      # isi DATABASE_URL + AUTH_SECRET + CRON_SECRET
 
 # butuh PostgreSQL lokal, contoh:
-# createdb spmtrade
+# createdb neuraly
 
 pnpm db:migrate           # prisma migrate dev
 pnpm db:seed              # user dummy + admin
@@ -56,26 +56,44 @@ ke Vercel Pro lalu tambahkan kembali entri `{"path": "/api/cron/signal-check",
 
 ## Akun seed
 
-Semua akun memakai password **`spmtrade123`**.
+Semua akun memakai password **`neuraly123`**.
 
 | Email | Username | Role |
 |---|---|---|
-| admin@spmtrade.local | `@admin` | admin |
-| papa@spmtrade.local | `@papaeemas` | USER |
-| ibukoin@spmtrade.local | `@ibukoin` | USER |
-| whalex@spmtrade.local | `@whalex` | USER |
-| risetkucing@spmtrade.local | `@risetkucing` | USER |
+| admin@neuraly.local | `@admin` | admin |
+| papa@neuraly.local | `@papaeemas` | USER |
+| ibukoin@neuraly.local | `@ibukoin` | USER |
+| whalex@neuraly.local | `@whalex` | USER |
+| risetkucing@neuraly.local | `@risetkucing` | USER |
 
-## OAuth (opsional)
+## OAuth (Google / X)
 
-Isi `GOOGLE_CLIENT_ID`/`GOOGLE_CLIENT_SECRET` dan/atau `X_CLIENT_ID`/
-`X_CLIENT_SECRET` di `.env`. Tombol OAuth otomatis muncul di `/login` dan
-`/register` hanya jika kredensial tersedia.
+Tombol "Lanjutkan dengan Google" (dan "Lanjutkan dengan X") di `/login`
+dan `/register` muncul otomatis hanya jika kredensial provider-nya
+tersedia — tanpa kredensial, tombolnya disembunyikan, bukan ditampilkan
+rusak. Alurnya: klik tombol → provider → kembali ke `?next=` (bila ada,
+divalidasi path internal saja). Akun Google baru dibuatkan username unik
+otomatis dari nama/email plus baris `SignalStat` kosong; akun Google yang
+emailnya sama dengan akun email/password yang sudah ada akan masuk ke
+akun itu (email Google sudah terverifikasi oleh Google, jadi penautan
+berbasis email aman untuk Google). Error OAuth ditampilkan di `/login`
+(`?error=`), bukan halaman kosong.
 
-Callback URL:
+Menyiapkan Google (produksi):
 
-- Google: `http://localhost:3000/api/auth/callback/google`
-- X/Twitter: `http://localhost:3000/api/auth/callback/twitter`
+1. Google Cloud Console → APIs & Services → Credentials → Create
+   Credentials → OAuth client ID → Web application.
+2. Authorized redirect URI (wajib persis, satu per baris bila perlu
+   lokal + produksi):
+   - `http://localhost:3000/api/auth/callback/google`
+   - `https://trade-tweet.vercel.app/api/auth/callback/google`
+3. Set `GOOGLE_CLIENT_ID` dan `GOOGLE_CLIENT_SECRET` di environment
+   Vercel (Production + Preview), lalu **redeploy** — env baru hanya
+   berlaku untuk deployment baru, jadi tombol Google baru muncul setelah
+   redeploy. Lokal: isi keduanya di `.env`.
+
+Callback URL X/Twitter: `http://localhost:3000/api/auth/callback/twitter`
+(dan padanannya di domain produksi bila X diaktifkan).
 
 ## Status fase
 
@@ -179,5 +197,5 @@ curl -X POST "http://localhost:3000/api/cron/daily-stats?day=2026-11-03" \
   posting 10/menit per user → `429` dengan header `Retry-After`. Baris lama
   dibersihkan cron `daily-stats`.
 - **Admin badge `/admin/badges`** (role `admin`): beri/cabut badge manual
-  `verified` & `curator`. Admin seed: `admin@spmtrade.local`.
+  `verified` & `curator`. Admin seed: `admin@neuraly.local`.
 - Katalog simbol: `GET /api/symbols?q=` (awalan simbol & awal kata nama).
