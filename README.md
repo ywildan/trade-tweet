@@ -36,10 +36,17 @@ pnpm start
 ```
 
 Catatan produksi: `CRON_SECRET` wajib diisi, kalau tidak kedua cron
-menolak dengan 500. Cron `signal-check` sudah terdaftar di `vercel.json`
-tiap 5 menit; di plan Vercel Hobby yang membatasi cron harian, jadwalkan
-endpoint yang sama dari scheduler eksternal dengan header
-`Authorization: Bearer $CRON_SECRET`.
+menolak dengan 500. Perhatian: `vercel.json` sengaja HANYA mendaftarkan
+`daily-stats` (sekali sehari, 01:10). Cron `signal-check` tiap 5 menit
+(`*/5 * * * *`) TIDAK boleh ada di `vercel.json` pada plan Vercel Hobby —
+Vercel menolak deployment-nya dengan error "Hobby accounts are limited to
+daily cron jobs" (ini yang membuat deploy gagal pada 2026-11-05; tautan
+Details di check GitHub mengarah ke halaman batas cron Vercel). Supaya
+sinyal tetap ter-resolve tiap 5 menit di Hobby, jadwalkan endpoint
+`GET /api/cron/signal-check` dari scheduler eksternal (mis. cron-job.org)
+dengan header `Authorization: Bearer $CRON_SECRET`. Alternatifnya, upgrade
+ke Vercel Pro lalu tambahkan kembali entri `{"path": "/api/cron/signal-check",
+"schedule": "*/5 * * * *"}` ke `vercel.json`.
 
 ## Akun seed
 
