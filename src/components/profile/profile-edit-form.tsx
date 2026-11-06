@@ -6,10 +6,15 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Avatar } from "@/components/ui/avatar";
 import { Field, inputClass, textareaClass } from "@/components/ui/form";
-import { firstFieldErrors, profileUpdateSchema } from "@/lib/validation";
+import {
+  USERNAME_CHANGE_LIMIT,
+  firstFieldErrors,
+  profileUpdateSchema,
+} from "@/lib/validation";
 
 type EditableUser = {
   username: string;
+  usernameChangeCount: number;
   name: string;
   bio: string | null;
   location: string | null;
@@ -20,7 +25,11 @@ type EditableUser = {
 export function ProfileEditForm({ user }: { user: EditableUser }) {
   const router = useRouter();
 
+  const remainingChanges = USERNAME_CHANGE_LIMIT - user.usernameChangeCount;
+  const canRename = remainingChanges > 0;
+
   const [form, setForm] = useState({
+    username: user.username,
     name: user.name,
     bio: user.bio ?? "",
     location: user.location ?? "",
@@ -88,6 +97,12 @@ export function ProfileEditForm({ user }: { user: EditableUser }) {
 
       setSaved(true);
       setPending(false);
+      const newUsername = json?.data?.user?.username as string | undefined;
+      if (newUsername && newUsername !== user.username) {
+        // Username berubah: URL profil lama tidak berlaku lagi.
+        router.push(`/@${newUsername}`);
+        return;
+      }
       router.refresh();
     } catch {
       setMessage("Tidak bisa menghubungi server. Coba lagi.");
@@ -144,6 +159,27 @@ export function ProfileEditForm({ user }: { user: EditableUser }) {
         </div>
         <div className="h-12" />
       </section>
+
+      <Field
+        label="Username"
+        htmlFor="profile-username"
+        error={errors.username}
+        hint={
+          canRename
+            ? `Sisa ${remainingChanges} dari ${USERNAME_CHANGE_LIMIT} pergantian · 3–15 karakter, huruf kecil, angka, underscore`
+            : `Kamu sudah ${USERNAME_CHANGE_LIMIT} kali mengganti username`
+        }
+      >
+        <input
+          id="profile-username"
+          value={form.username}
+          onChange={update("username")}
+          className={`${inputClass} disabled:cursor-not-allowed disabled:opacity-50`}
+          maxLength={15}
+          autoComplete="username"
+          disabled={!canRename}
+        />
+      </Field>
 
       <Field
         label="Nama tampilan"

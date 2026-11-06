@@ -1,8 +1,12 @@
+import type { Prisma } from "@/generated/prisma/client";
 import { auth, unstable_update } from "@/auth";
-import { apiError, apiOk, handleApiError } from "@/lib/api";
+import { apiError, apiOk, handleApiError, isUniqueConstraintError } from "@/lib/api";
 import { prisma } from "@/lib/db";
 import { publicUserSelect, serializePublicUser } from "@/lib/users";
-import { profileUpdateSchema } from "@/lib/validation";
+import {
+  USERNAME_CHANGE_LIMIT,
+  profileUpdateSchema,
+} from "@/lib/validation";
 
 type Context = { params: Promise<{ username: string }> };
 
@@ -39,7 +43,7 @@ export async function PATCH(request: Request, context: Context) {
     const { username } = await context.params;
     const target = await prisma.user.findUnique({
       where: { username: username.toLowerCase() },
-      select: { id: true, username: true },
+      select: { id: true, username: true, usernameChangeCount: true },
     });
     if (!target) {
       return apiError("NOT_FOUND", "Pengguna tidak ditemukan.", 404);
@@ -56,13 +60,65 @@ export async function PATCH(request: Request, context: Context) {
       });
     }
 
-    const row = await prisma.user.update({
-      where: { id: target.id },
-      data: parsed.data,
-      select: { ...publicUserSelect, email: true },
-    });
+    const newUsername = parsed.data.username;
+    const wantsRename =
+      newUsername !== undefined && newUsername !== target.username;
 
-    // Segarkan klaim JWT (nama/avatar di nav) tanpa memaksa login ulang.
+    if (wantsRename) {
+      if (target.usernameChangeCount >= USERNAME_CHANGE_LIMIT) {
+        return apiError(
+          "FORBIDDEN",
+          `Kamu sudah ${USERNAME_CHANGE_LIMIT} kali mengganti username, jadi tidak bisa diubah lagi.`,
+          403,
+        );
+      }
+      const taken = await prisma.user.findUnique({
+        where: { username: newUsername },
+        select: { id: true },
+      });
+      if (taken) {
+        return apiError(
+          "CONFLICT",
+          "Username sudah dipakai pengguna lain.",
+          409,
+        );
+      }
+    }
+
+    const data: Prisma.UserUpdateInput = {
+      name: parsed.data.name,
+      bio: parsed.data.bio,
+      location: parsed.data.location,
+      avatarUrl: parsed.data.avatarUrl,
+      bannerUrl: parsed.data.bannerUrl,
+    };
+    if (wantsRename) {
+      // Username + counter naik bersamaan dalam satu update atomik.
+      data.username = newUsername;
+      data.usernameChangeCount = { increment: 1 };
+    }
+
+    let row;
+    try {
+      row = await prisma.user.update({
+        where: { id: target.id },
+        data,
+        select: { ...publicUserSelect, email: true },
+      });
+    } catch (error) {
+      // Balapan dengan rename lain ke username yang sama.
+      if (isUniqueConstraintError(error)) {
+        return apiError(
+          "CONFLICT",
+          "Username sudah dipakai pengguna lain.",
+          409,
+        );
+      }
+      throw error;
+    }
+
+    // Segarkan klaim JWT (nama/avatar/username di nav) tanpa memaksa login
+    // ulang — callback JWT membaca ulang user dari DB saat trigger "update".
     try {
       await unstable_update({});
     } catch (error) {

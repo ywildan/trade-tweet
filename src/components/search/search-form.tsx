@@ -18,10 +18,8 @@ export function SearchForm({
       {tab && tab !== "top" && (
         <input type="hidden" name="tab" value={tab} />
       )}
-      <label
-        htmlFor={inputId}
-        className="mb-1 block text-[13px] font-semibold text-text"
-      >
+      {/* Label disembunyikan dari tampilan tapi tetap ada untuk screen reader. */}
+      <label htmlFor={inputId} className="sr-only">
         Cari trader, postingan, atau simbol
       </label>
       <span className="flex min-h-11 items-center gap-2 rounded-lg bg-bg-input px-4 py-2.5 text-text-muted focus-within:ring-1 focus-within:ring-accent/50">
