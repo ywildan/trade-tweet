@@ -46,25 +46,39 @@ export const loginSchema = z.object({
   password: z.string().min(1, "Password wajib diisi.").max(72),
 });
 
-const optionalMediaUrl = z
-  .string()
-  .trim()
-  .max(500, "URL maksimal 500 karakter.")
-  .refine(
-    (value) => value === "" || /^(https?:\/\/|\/)\S*$/i.test(value),
-    "URL harus diawali http://, https://, atau /.",
-  )
-  .transform((value) => (value === "" ? null : value));
+/** Terima null sebagai string kosong: klien mengirim hasil transform
+    "" -> null dari safeParse pertama, dan server memvalidasi ulang body
+    yang sama — tanpa ini, field kosong ditolak dengan
+    "expected string, received null". */
+const nullToEmpty = (value: unknown) => (value === null ? "" : value);
 
-const optionalText = (max: number, label: string) =>
+const optionalMediaUrl = z.preprocess(
+  nullToEmpty,
   z
     .string()
     .trim()
-    .max(max, `${label} maksimal ${max} karakter.`)
-    .transform((value) => (value === "" ? null : value));
+    .max(500, "URL maksimal 500 karakter.")
+    .refine(
+      (value) => value === "" || /^(https?:\/\/|\/)\S*$/i.test(value),
+      "URL harus diawali http://, https://, atau /.",
+    )
+    .transform((value) => (value === "" ? null : value)),
+);
 
+const optionalText = (max: number, label: string) =>
+  z.preprocess(
+    nullToEmpty,
+    z
+      .string()
+      .trim()
+      .max(max, `${label} maksimal ${max} karakter.`)
+      .transform((value) => (value === "" ? null : value)),
+  );
+
+/** Edit profil: hanya nama dan username yang wajib; bio, lokasi, dan
+    URL avatar/banner boleh kosong (null). */
 export const profileUpdateSchema = z.object({
-  username: usernameSchema.optional(),
+  username: usernameSchema,
   name: z
     .string()
     .trim()

@@ -4,6 +4,7 @@ import {
   MessageCircle,
   Bookmark,
   Share,
+  User,
 } from "lucide-react";
 import { formatCount } from "@/lib/format";
 import { UserBadges } from "@/components/ui/badge";
@@ -82,17 +83,8 @@ export function DemoPostCard({ symbol = "XAUUSD" }: { symbol?: string }) {
   );
 }
 
-/** Avatar demo: inisial 2 huruf, latar deterministik dari nama. */
-/* Sama seperti Avatar asli: warna solid gelap supaya inisial putih lolos 4,5:1. */
-const AVATAR_PALETTES = [
-  "bg-[#0b6ea8]",
-  "bg-[#00875a]",
-  "bg-[#c2185b]",
-  "bg-[#8a6d00]",
-  "bg-[#d92d20]",
-  "bg-[#536471]",
-];
-
+/** Avatar demo: ikon orang abu-abu, sama seperti Avatar asli saat pengguna
+    tidak mengisi URL avatar. */
 export function Avatar({
   name,
   size = 40,
@@ -100,22 +92,18 @@ export function Avatar({
   name: string;
   size?: number;
 }) {
-  const initials = name
-    .split(/\s+/)
-    .slice(0, 2)
-    .map((w) => w[0])
-    .join("")
-    .toUpperCase();
-  let h = 0;
-  for (const ch of name) h = (h * 31 + ch.charCodeAt(0)) >>> 0;
-  const bg = AVATAR_PALETTES[h % AVATAR_PALETTES.length];
   return (
     <div
-      className={`rounded-full shrink-0 inline-flex items-center justify-center text-white font-bold ${bg}`}
-      style={{ width: size, height: size, fontSize: size * 0.3 }}
+      className="rounded-full shrink-0 inline-flex items-center justify-center bg-text-muted text-bg"
+      style={{ width: size, height: size }}
       aria-hidden
+      title={name}
     >
-      {initials}
+      <User
+        width={Math.round(size * 0.55)}
+        height={Math.round(size * 0.55)}
+        strokeWidth={2}
+      />
     </div>
   );
 }

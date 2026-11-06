@@ -1,26 +1,7 @@
-/* Warna avatar solid: varian gelap tiap token supaya inisial putih lolos
-   4,5:1 (aksen #0b6ea8, hijau #00875a, pink #c2185b, emas #8a6d00,
-   merah #d92d20, abu #536471). */
-const PALETTES = [
-  "bg-[#0b6ea8]",
-  "bg-[#00875a]",
-  "bg-[#c2185b]",
-  "bg-[#8a6d00]",
-  "bg-[#d92d20]",
-  "bg-[#536471]",
-];
+import { User } from "lucide-react";
 
-function initials(name: string) {
-  return name
-    .trim()
-    .split(/\s+/)
-    .slice(0, 2)
-    .map((word) => word[0])
-    .join("")
-    .toUpperCase();
-}
-
-/* Avatar dengan fallback inisial + warna deterministik dari nama. */
+/* Avatar default: ikon orang abu-abu di dalam lingkaran abu-abu, seperti
+   avatar bawaan Instagram — tampil saat pengguna tidak mengisi URL avatar. */
 export function Avatar({
   name,
   src,
@@ -32,10 +13,6 @@ export function Avatar({
   size?: number;
   className?: string;
 }) {
-  let hash = 0;
-  for (const char of name) hash = (hash * 31 + char.charCodeAt(0)) >>> 0;
-  const palette = PALETTES[hash % PALETTES.length];
-
   return (
     <span
       className={`inline-flex shrink-0 items-center justify-center overflow-hidden rounded-full ${className}`}
@@ -54,10 +31,13 @@ export function Avatar({
       ) : (
         <span
           aria-hidden
-          className={`inline-flex h-full w-full items-center justify-center font-bold text-white ${palette}`}
-          style={{ fontSize: Math.max(11, size * 0.3) }}
+          className="inline-flex h-full w-full items-center justify-center bg-text-muted text-bg"
         >
-          {initials(name) || "?"}
+          <User
+            width={Math.round(size * 0.55)}
+            height={Math.round(size * 0.55)}
+            strokeWidth={2}
+          />
         </span>
       )}
     </span>
