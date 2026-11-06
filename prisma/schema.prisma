@@ -22,6 +22,7 @@ model User {
   bannerUrl    String?
   location     String?
   role         String   @default("USER") // "USER" | "admin"
+  usernameChangeCount Int @default(0) // berapa kali username diganti (maks 3)
   createdAt    DateTime @default(now())
 
   posts         Post[]

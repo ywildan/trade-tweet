@@ -1,9 +1,9 @@
-import Link from "next/link";
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
 
 import { LogoutButton } from "@/components/auth/logout-button";
 import { ProfileEditForm } from "@/components/profile/profile-edit-form";
+import { BackButton } from "@/components/ui/back-button";
 import { getSessionUser } from "@/lib/session";
 import { getUserById } from "@/lib/users";
 
@@ -31,13 +31,7 @@ async function SettingsView() {
   return (
     <>
       <header className="sticky top-0 z-20 flex h-[53px] items-center gap-4 border-b border-border bg-bg px-3">
-        <Link
-          href={`/@${user.username}`}
-          aria-label="Kembali ke profil"
-          className="-ml-2 flex min-h-11 min-w-11 items-center justify-center rounded-lg p-2 text-[20px] transition-colors hover:bg-text/10"
-        >
-          ←
-        </Link>
+        <BackButton href={`/@${user.username}`} label="Kembali ke profil" />
         <div>
           <h1 className="text-[20px] font-bold leading-6">Kelola profil</h1>
           <p className="text-[13px] leading-4 text-text-muted">
@@ -50,6 +44,7 @@ async function SettingsView() {
         <ProfileEditForm
           user={{
             username: user.username,
+            usernameChangeCount: user.usernameChangeCount,
             name: user.name,
             bio: user.bio,
             location: user.location,
@@ -76,7 +71,7 @@ function SettingsSkeleton() {
   return (
     <div aria-hidden>
       <header className="flex h-[53px] items-center gap-4 border-b border-border px-3">
-        <span className="text-[20px] text-text-muted">←</span>
+        <span className="h-11 w-11 shrink-0 rounded-lg bg-bg-input" />
         <div className="h-4 w-32 rounded bg-bg-input" />
       </header>
       <div className="space-y-4 p-4">

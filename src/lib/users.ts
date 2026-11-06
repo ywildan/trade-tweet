@@ -6,6 +6,7 @@ import { uniqueUsername } from "@/lib/usernames";
 export const publicUserSelect = {
   id: true,
   username: true,
+  usernameChangeCount: true,
   name: true,
   bio: true,
   avatarUrl: true,
@@ -38,6 +39,7 @@ type PublicUserRow = Prisma.UserGetPayload<{ select: typeof publicUserSelect }>;
 export type PublicUser = {
   id: string;
   username: string;
+  usernameChangeCount: number;
   name: string;
   bio: string | null;
   avatarUrl: string | null;
@@ -58,6 +60,7 @@ export function serializePublicUser(
   return {
     id: row.id,
     username: row.username,
+    usernameChangeCount: row.usernameChangeCount,
     name: row.name,
     bio: row.bio,
     avatarUrl: row.avatarUrl,

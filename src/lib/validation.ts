@@ -8,6 +8,9 @@ import {
   type MarketName,
 } from "@/lib/symbols";
 
+/** Maksimal pergantian username per pengguna (dihitung sejak fitur ini rilis). */
+export const USERNAME_CHANGE_LIMIT = 3;
+
 /** Handle @username di DB: lowercase, 3–15 karakter (spesifikasi.md §3). */
 export const usernameSchema = z
   .string()
@@ -61,6 +64,7 @@ const optionalText = (max: number, label: string) =>
     .transform((value) => (value === "" ? null : value));
 
 export const profileUpdateSchema = z.object({
+  username: usernameSchema.optional(),
   name: z
     .string()
     .trim()
